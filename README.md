@@ -10,4 +10,4 @@ Model Predictive Control(MPC) for trajectory tracking on Unmanned Ground Vehicle
 2. Implementation and demonstration on hardware
 
  GiF for Simulation result: 
- 
+ ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Sim.gif)
