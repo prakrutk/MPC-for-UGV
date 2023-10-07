@@ -9,8 +9,10 @@ Model Predictive Control(MPC) for trajectory tracking on Unmanned Ground Vehicle
 1. Dynamic obstacle avoidance
 2. Implementation and demonstration on hardware
 
- GiF for Simulation result in PyBullet: 
+#### GiF for Simulation result in PyBullet: 
+ 
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Pybullet/Sim.gif)
 
-Image of Environment in Gazebo: 
+#### Image of Environment in Gazebo: 
+
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/ROS-Gazebo/Cafe_Husky.jpeg)
