@@ -13,4 +13,4 @@ Model Predictive Control(MPC) for trajectory tracking on Unmanned Ground Vehicle
 ![]()
 
 Image of Environment in Gazebo: 
-![]()
+![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/ROS-Gazebo/Cafe_Husky.jpeg)
