@@ -1,4 +1,4 @@
-# Read a video stream from camera (here, a video file) and detect edges using Canny edge detection algorithm
+# Read a video stream from camera (here, a video file) and detect ground surface using Canny edge detection
 
 import cv2
 import numpy as np
@@ -19,3 +19,8 @@ canny = cv2.Canny(blur, 50, 150)
 cv2.imshow('canny', canny)
 cv2.waitKey(0)
 
+# Find contours
+contours, hierarchy = cv2.findContours(canny, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+cv2.drawContours(im, contours, -1, (0, 255, 0), 3)
+cv2.imshow('contours', im)
+cv2.waitKey(0)
