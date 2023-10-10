@@ -17,10 +17,12 @@ canny = cv2.Canny(blur, 50, 150)
 
 # Display the frame
 cv2.imshow('canny', canny)
+cv2.imwrite('Waypoint_generation/canny.png', canny)
 cv2.waitKey(0)
 
 # Find contours
 contours, hierarchy = cv2.findContours(canny, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 cv2.drawContours(im, contours, -1, (0, 255, 0), 3)
 cv2.imshow('contours', im)
+cv2.imwrite('Waypoint_generation/contours.png', im)
 cv2.waitKey(0)
