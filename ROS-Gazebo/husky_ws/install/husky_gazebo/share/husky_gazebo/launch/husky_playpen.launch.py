@@ -10,7 +10,7 @@ def generate_launch_description():
     world_file = PathJoinSubstitution(
         [FindPackageShare("husky_gazebo"),
         "worlds",
-        "clearpath_playpen.world"],
+        "cafe.world"],
     )
 
     gazebo_launch = PathJoinSubstitution(
