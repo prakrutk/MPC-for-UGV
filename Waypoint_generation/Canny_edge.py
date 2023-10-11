@@ -1,7 +1,10 @@
 # Read a video stream from camera (here, a video file) and detect ground surface using Canny edge detection
-
-import cv2
+# Libraries for working with image processing
 import numpy as np
+import cv2
+# Libraries needed to edit/save/watch video clips
+from moviepy import editor
+import moviepy
 
 # Read the image
 im = cv2.imread('Waypoint_generation/Test.png')
@@ -148,7 +151,7 @@ def lane_lines(image, lines):
     """
     left_lane, right_lane = average_slope_intercept(lines)
     y1 = image.shape[0]
-    y2 = y1 * 0.6
+    y2 = y1 * 0.7
     left_line  = pixel_points(y1, y2, left_lane)
     right_line = pixel_points(y1, y2, right_lane)
     return left_line, right_line
@@ -172,12 +175,5 @@ def draw_lane_lines(image, lines, color=[255, 0, 0], thickness=12):
 result = draw_lane_lines(im, lane_lines(im, hough))
 
 cv2.imshow('result', result)
-cv2.imshow('midpoint', im)
 cv2.waitKey(0)
-
-# Find contours
-contours, hierarchy = cv2.findContours(masked_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-cv2.drawContours(im, contours, -1, (0, 255, 0), 3)
-cv2.imshow('contours', im)
-cv2.imwrite('Waypoint_generation/contours.png', im)
-cv2.waitKey(0)
+cv2.imwrite('Waypoint_generation/result.png', result)
