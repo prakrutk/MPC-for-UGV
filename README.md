@@ -16,3 +16,10 @@ Model Predictive Control(MPC) for trajectory tracking on Unmanned Ground Vehicle
 #### Image of Environment in Gazebo: 
 
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/ROS-Gazebo/Cafe_Husky.jpeg)
+
+#### Waypoint Generation: 
+##### Canny-Edge detection: 
+![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Waypoint_generation/canny.png)
+
+##### Contours: 
+![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Waypoint_generation/contours.png)
