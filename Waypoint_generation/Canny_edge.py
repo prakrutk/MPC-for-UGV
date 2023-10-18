@@ -1,5 +1,3 @@
-# Read a video stream from camera (here, a video file) and detect ground surface using Canny edge detection
-# Libraries for working with image processing
 import numpy as np
 import cv2
 # Libraries needed to edit/save/watch video clips
@@ -65,32 +63,6 @@ maxLineGap = 500
 # appearing in the input image
 hough = cv2.HoughLinesP(masked_image, rho = rho, theta = theta, threshold = threshold,
                         minLineLength = minLineLength, maxLineGap = maxLineGap)
-# # Find the minimum and maximum row index
-# min_row_index = np.min(row_index)
-# max_row_index = np.max(row_index)
-# # for i in range(0, 10):
-# # find the row indices that are 30% above from bottom of the image
-# row_threshold = (max_row_index - min_row_index)
-# row_index_high = min_row_index + row_threshold
-
-# # find edges that correspond to the above rows
-# row_index_high = row_index[row_index >= row_index_high]
-# row_index_point, column_index_point = np.nonzero(canny[row_index_high, :])
-# row_index_mean = int(np.mean(row_index_point))
-
-# # Take mean of column indices
-# column_index_mean= int(np.mean(column_index_point))
-
-# # plot a plot at the above row_index and column_index
-# cv2.circle(im_crop, (row_index_mean, column_index_mean), 5, (0, 0, 255), -1)
-
-#     # # find column indices that correspond to the above rows
-#     # column_index_high = column_index[row_index_high]
-
-#     # # plot a plot at the midpoint of the above rows and columns
-#     # midpoint_row = int(np.mean(row_index_high))
-#     # midpoint_column = int(np.mean(column_index_high))
-#     # cv2.circle(im, (midpoint_column, midpoint_row), 5, (0, 0, 255), -1)
 
 def average_slope_intercept(lines):
     """
