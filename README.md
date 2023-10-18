@@ -2,22 +2,24 @@
 
 ## Model Predictive Control (MPC) for Unmanned Ground Vehicles (UGV)
 
-### Problem Statement:
+## Problem Statement:
 Model Predictive Control(MPC) for trajectory tracking on Unmanned Ground Vehicle (UGV) with waypoint generation in unknown environment using perception. 
 
 #### Possible Extensions:  
 1. Dynamic obstacle avoidance
 2. Implementation and demonstration on hardware
 
-#### GiF for Simulation result in PyBullet: 
+### Simulation result: 
+
+#### PyBullet: 
  
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Pybullet/Sim.gif)
 
-#### Image of Environment in Gazebo: 
+#### Gazebo: 
 
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/ROS-Gazebo/Cafe_Husky.jpeg)
 
-#### Waypoint Generation: 
+### Waypoint Generation: 
 ##### Actual Image: 
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Waypoint_generation/Test.png)
 
@@ -27,10 +29,10 @@ Model Predictive Control(MPC) for trajectory tracking on Unmanned Ground Vehicle
 ##### Contours: 
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Waypoint_generation/contours.png)
 
-#### Dynamics Model:
+### Dynamics Model:
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Model.png)
 
-##### Notations:
+#### Notations:
 State variable: $ X = (x,y,\psi , \dot x, \dot y, \dot \psi  )$
 
 Input/control variable: $ U = (\delta, \omega )$
@@ -47,7 +49,7 @@ $l_f$ is the distance of the front wheel from the COM of the car. \
 $l_r$ is the distance of the rear wheel from the COM of the car. \
 $\beta $ is the sideslip angle of the car. (Not used) 
 
-Dynamics of the car: 
+#### Dynamics equation of the car: 
 
 $$ m\ddot x = f_{f_x}cos\delta - f_{f_y}sin\delta + f_{r_x} + m\dot y\dot \psi \\ m\ddot y = f_{f_y}cos\delta + f_{f_x}sin\delta + f_{r_y} - m\dot x\dot \psi \\ I_z\ddot \psi = l_f(f_{f_x}sin\delta + f_{f_y}cos\delta) - f_{r_y}l_r$$
 
@@ -58,6 +60,11 @@ $c_l$ is the longitudinal stiffness of the tire. \
 $\alpha_f$ is the slip ratio of the front wheel. \
 $\alpha_r$ is the slip ratio of the rear wheel. 
 
+$$f_{f_x} = C_ls_f$$ 
+$$f_{f_y} = C_c\alpha_f$$ 
+$$f_{r_x} = C_ls_r$$ 
+$$f_{r_y} = C_c\alpha_r$$ 
+Assuming small steering angle and small slip angle, the dynamics of the car can be approximated as:
 $$ m\ddot x = C_ls_f - C_c\alpha_f\delta + c_ls_r + m\dot y\dot \psi \\ m\ddot y = C_c\alpha_f + C_ls_f\delta + c_c\alpha_r - m\dot x\dot \psi \\ 
 I_z\ddot \psi = l_f(C_ls_f\delta + C_c\alpha_f) - c_c\alpha_rl_r $$
 
