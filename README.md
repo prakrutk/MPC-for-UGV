@@ -31,9 +31,9 @@ Model Predictive Control(MPC) for trajectory tracking on Unmanned Ground Vehicle
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Model.png)
 
 ##### Notations:
-State variable: $ X = (x,y,\psi , \dot x, \dot y, \dot \psi  )$
+State variable: $X = (x,y,\psi , \dot x, \dot y, \dot \psi)$
 
-Input/control variable: $ U = (\delta, \omega )$
+Input/control variable: $U = (\delta, \omega )$
 
 Where, \
 $x,y$ are coordinates of the COM of the car in world frame. \
