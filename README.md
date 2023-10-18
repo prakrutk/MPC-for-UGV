@@ -28,6 +28,6 @@ Model Predictive Control(MPC) for trajectory tracking on Unmanned Ground Vehicle
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Waypoint_generation/contours.png)
 
 #### Dynamics Model:
-![]()
+![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Model.png)
 
 ##### Notations:
