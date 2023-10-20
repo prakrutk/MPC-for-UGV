@@ -72,6 +72,9 @@ $$ f_{f_y} = C_c\alpha_f$$
 
 With the assumptions and substituting the above equations in the dynamics equation of the car, we get:
 
-$$ m\ddot x = C_ls_f - C_c\alpha_f\delta + c_ls_r + m\dot y\dot \psi \\ m\ddot y = C_c\alpha_f + C_ls_f\delta + c_c\alpha_r - m\dot x\dot \psi \\ 
-I_z\ddot \psi = l_f(C_ls_f\delta + C_c\alpha_f) - c_c\alpha_rl_r $$
+$$ m\ddot x = C_ls_f - C_c\alpha_f\delta + c_ls_r + m\dot y\dot \psi$$ 
+
+$$m\ddot y = C_c\alpha_f + C_ls_f\delta + c_c\alpha_r - m\dot x\dot \psi $$ 
+
+$$I_z\ddot \psi = l_f(C_ls_f\delta + C_c\alpha_f) - c_c\alpha_rl_r $$
 
