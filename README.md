@@ -78,3 +78,22 @@ $$m\ddot y = C_c\alpha_f + C_ls_f\delta + c_c\alpha_r - m\dot x\dot \psi $$
 
 $$I_z\ddot \psi = l_f(C_ls_f\delta + C_c\alpha_f) - c_c\alpha_rl_r $$
 
+#### MPC Formulation:
+
+$$ \min_{\Delta U, \epsilon } \begin{bmatrix} \Delta U , \epsilon \end{bmatrix}^T H\begin{bmatrix} \Delta U , \epsilon \end{bmatrix} \begin{bmatrix} \Delta U , \epsilon \end{bmatrix} + f\begin{bmatrix} \Delta U , \epsilon \end{bmatrix}$$
+
+$$ \Delta U_{min} \leq \Delta U \leq \Delta U_{max}$$
+
+$$ U_{min} \leq u(t-1) + \sum_{i=t}^{t+N_c-1} \Delta U(i) \leq U_{max}$$
+
+$$ Y_{min} - \epsilon \leq \Phi_{X(t|t)} + \Theta \Delta U(t) \leq Y_{max} + \epsilon$$
+
+Where: 
+
+$H = \begin{bmatrix} \Theta ^T Q \Theta + R & 0 \\ 0 & \rho \end{bmatrix}$
+
+$f = \begin{bmatrix} 2E^TQ\Theta & 0\end{bmatrix}$
+
+$\epsilon$ = Slack variable
+
+$ Y = \Phi_{X(t|t)} + \Theta \Delta U(t)$
