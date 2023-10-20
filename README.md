@@ -90,10 +90,10 @@ $$ Y_{min} - \epsilon \leq \Phi_{X(t|t)} + \Theta \Delta U(t) \leq Y_{max} + \ep
 
 Where: 
 
-$H = \begin{bmatrix} \Theta ^T Q \Theta + R & 0 \\ 0 & \rho \end{bmatrix}$
+$$H = \begin{bmatrix} \Theta ^T Q \Theta + R & 0 \\ 0 & \rho \end{bmatrix}$$
 
-$f = \begin{bmatrix} 2E^TQ\Theta & 0\end{bmatrix}$
+$$f = \begin{bmatrix} 2E^TQ\Theta & 0\end{bmatrix}$$
 
-$\epsilon$ = Slack variable
+$$\epsilon = \text{Slack variable} $$
 
-$ Y = \Phi_{X(t|t)} + \Theta \Delta U(t)$
+$$Y = \Phi_{X(t|t)} + \Theta \Delta U(t)$$
