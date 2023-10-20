@@ -26,8 +26,8 @@ Model Predictive Control(MPC) for trajectory tracking on Unmanned Ground Vehicle
 ##### Canny-Edge detection: 
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Waypoint_generation/canny.png)
 
-##### Contours: 
-![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Waypoint_generation/contours.png)
+##### Hough Line: 
+![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Waypoint_generation/result.png)
 
 ### Dynamics Model:
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Model.png)
