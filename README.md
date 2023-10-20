@@ -41,7 +41,7 @@ $\psi$ is the heading angle of the car. \
 $\delta$ is the steering angle of the car. \
 $\omega$ is the rotational speed of both the wheels.
 
-$f_{f_x} ,f_{f_y} ,f_{r_x} ,f_{r_y}$ are the force acting in the body frame of front and rear wheel of the car respectively. \
+$f_{f_x} ,f_{f_y} ,f_{r_x} ,f_{r_y}$ are the force acting in the body frame of front and rear wheel of the car respectively. 
 
 $l_f$ is the distance of the front wheel from the COM of the car. \
 $l_r$ is the distance of the rear wheel from the COM of the car. \
