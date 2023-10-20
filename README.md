@@ -45,7 +45,7 @@ $f_{f_x} ,f_{f_y} ,f_{r_x} ,f_{r_y}$ are the force acting in the body frame of f
 
 $l_f$ is the distance of the front wheel from the COM of the car. \
 $l_r$ is the distance of the rear wheel from the COM of the car. \
-$\beta $ is the sideslip angle of the car. (Not used) 
+$\beta$ is the sideslip angle of the car. (Not used) 
 
 Dynamics of the car: 
 
