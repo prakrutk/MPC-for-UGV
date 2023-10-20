@@ -1,0 +1,38 @@
+[0.164s] Invoking command in '/home/prakrutk/husky_ws/build/husky_control': AMENT_PREFIX_PATH=/home/prakrutk/husky_ws/install/husky_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/prakrutk/husky_ws/install/husky_description:/opt/ros/humble /usr/bin/cmake --build /home/prakrutk/husky_ws/build/husky_control -- -j8 -l8
+[0.215s] Invoked command in '/home/prakrutk/husky_ws/build/husky_control' returned '0': AMENT_PREFIX_PATH=/home/prakrutk/husky_ws/install/husky_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/prakrutk/husky_ws/install/husky_description:/opt/ros/humble /usr/bin/cmake --build /home/prakrutk/husky_ws/build/husky_control -- -j8 -l8
+[0.249s] Invoking command in '/home/prakrutk/husky_ws/build/husky_control': AMENT_PREFIX_PATH=/home/prakrutk/husky_ws/install/husky_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/prakrutk/husky_ws/install/husky_description:/opt/ros/humble /usr/bin/cmake --install /home/prakrutk/husky_ws/build/husky_control
+[0.263s] -- Install configuration: ""
+[0.263s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/config
+[0.266s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/config/localization.yaml
+[0.267s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/config/teleop_logitech.yaml
+[0.267s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/config/empty.yaml
+[0.267s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/config/public_interface.yaml
+[0.268s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/config/twist_mux.yaml
+[0.268s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/config/gazebo_interface.yaml
+[0.268s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/config/imu_filter.yaml
+[0.269s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/config/teleop_ps4.yaml
+[0.269s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/config/control.yaml
+[0.269s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/config/teleop_interactive_markers.yaml
+[0.269s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/launch
+[0.269s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/launch/teleop_base.launch.py
+[0.269s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/launch/control.launch
+[0.269s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/launch/teleop_joy.launch.py
+[0.270s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/launch/teleop.launch
+[0.270s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/launch/move_husky.py
+[0.270s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/launch/control.launch.py
+[0.270s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/ament_index/resource_index/package_run_dependencies/husky_control
+[0.271s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/ament_index/resource_index/parent_prefix_path/husky_control
+[0.271s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/environment/ament_prefix_path.sh
+[0.272s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/environment/ament_prefix_path.dsv
+[0.272s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/environment/path.sh
+[0.272s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/environment/path.dsv
+[0.273s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/local_setup.bash
+[0.282s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/local_setup.sh
+[0.283s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/local_setup.zsh
+[0.283s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/local_setup.dsv
+[0.283s] -- Installing: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/package.dsv
+[0.284s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/ament_index/resource_index/packages/husky_control
+[0.284s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/cmake/husky_controlConfig.cmake
+[0.284s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/cmake/husky_controlConfig-version.cmake
+[0.285s] -- Up-to-date: /home/prakrutk/husky_ws/install/husky_control/share/husky_control/package.xml
+[0.367s] Invoked command in '/home/prakrutk/husky_ws/build/husky_control' returned '0': AMENT_PREFIX_PATH=/home/prakrutk/husky_ws/install/husky_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/prakrutk/husky_ws/install/husky_description:/opt/ros/humble /usr/bin/cmake --install /home/prakrutk/husky_ws/build/husky_control

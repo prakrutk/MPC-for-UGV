@@ -1,0 +1,48 @@
+[0.052s] Invoking command in '/home/prakrutk/husky_ws/build/husky_viz': AMENT_PREFIX_PATH=/home/prakrutk/husky_ws/install/husky_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/prakrutk/husky_ws/install/husky_description:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake /home/prakrutk/husky_ws/src/husky/husky_viz -DCMAKE_INSTALL_PREFIX=/home/prakrutk/husky_ws/install/husky_viz
+[0.104s] -- The C compiler identification is GNU 11.4.0
+[0.155s] -- The CXX compiler identification is GNU 11.4.0
+[0.164s] -- Detecting C compiler ABI info
+[0.226s] -- Detecting C compiler ABI info - done
+[0.233s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.233s] -- Detecting C compile features
+[0.233s] -- Detecting C compile features - done
+[0.236s] -- Detecting CXX compiler ABI info
+[0.309s] -- Detecting CXX compiler ABI info - done
+[0.319s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.319s] -- Detecting CXX compile features
+[0.320s] -- Detecting CXX compile features - done
+[0.322s] -- Found ament_cmake: 1.3.5 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.495s] -- Found Python3: /usr/bin/python3.10 (found version "3.10.12") found components: Interpreter 
+[0.669s] -- Configuring done
+[0.671s] -- Generating done
+[0.672s] -- Build files have been written to: /home/prakrutk/husky_ws/build/husky_viz
+[0.676s] Invoked command in '/home/prakrutk/husky_ws/build/husky_viz' returned '0': AMENT_PREFIX_PATH=/home/prakrutk/husky_ws/install/husky_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/prakrutk/husky_ws/install/husky_description:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake /home/prakrutk/husky_ws/src/husky/husky_viz -DCMAKE_INSTALL_PREFIX=/home/prakrutk/husky_ws/install/husky_viz
+[0.678s] Invoking command in '/home/prakrutk/husky_ws/build/husky_viz': AMENT_PREFIX_PATH=/home/prakrutk/husky_ws/install/husky_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/prakrutk/husky_ws/install/husky_description:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --build /home/prakrutk/husky_ws/build/husky_viz -- -j8 -l8
+[0.713s] Invoked command in '/home/prakrutk/husky_ws/build/husky_viz' returned '0': AMENT_PREFIX_PATH=/home/prakrutk/husky_ws/install/husky_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/prakrutk/husky_ws/install/husky_description:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --build /home/prakrutk/husky_ws/build/husky_viz -- -j8 -l8
+[0.737s] Invoking command in '/home/prakrutk/husky_ws/build/husky_viz': AMENT_PREFIX_PATH=/home/prakrutk/husky_ws/install/husky_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/prakrutk/husky_ws/install/husky_description:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --install /home/prakrutk/husky_ws/build/husky_viz
+[0.744s] -- Install configuration: ""
+[0.745s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/launch
+[0.745s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/launch/view_robot.launch
+[0.746s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/launch/view_model_launch.py
+[0.747s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/launch/view_robot_launch.py
+[0.747s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/launch/view_model.launch
+[0.747s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/rviz
+[0.748s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/rviz/model.rviz
+[0.748s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/rviz/test.rviz
+[0.748s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/rviz/robot.rviz
+[0.748s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/ament_index/resource_index/package_run_dependencies/husky_viz
+[0.748s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/ament_index/resource_index/parent_prefix_path/husky_viz
+[0.749s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/environment/ament_prefix_path.sh
+[0.749s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/environment/ament_prefix_path.dsv
+[0.749s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/environment/path.sh
+[0.749s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/environment/path.dsv
+[0.749s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/local_setup.bash
+[0.749s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/local_setup.sh
+[0.750s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/local_setup.zsh
+[0.750s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/local_setup.dsv
+[0.750s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/package.dsv
+[0.750s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/ament_index/resource_index/packages/husky_viz
+[0.750s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/cmake/husky_vizConfig.cmake
+[0.750s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/cmake/husky_vizConfig-version.cmake
+[0.751s] -- Installing: /home/prakrutk/husky_ws/install/husky_viz/share/husky_viz/package.xml
+[0.799s] Invoked command in '/home/prakrutk/husky_ws/build/husky_viz' returned '0': AMENT_PREFIX_PATH=/home/prakrutk/husky_ws/install/husky_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/prakrutk/husky_ws/install/husky_description:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --install /home/prakrutk/husky_ws/build/husky_viz

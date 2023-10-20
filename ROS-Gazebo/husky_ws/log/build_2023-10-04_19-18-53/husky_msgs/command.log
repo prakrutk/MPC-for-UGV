@@ -1,0 +1,4 @@
+Invoking command in '/home/prakrutk/husky_ws/build/husky_msgs': CMAKE_PREFIX_PATH=/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake /home/prakrutk/husky_ws/src/husky/husky_msgs -DCMAKE_INSTALL_PREFIX=/home/prakrutk/husky_ws/install/husky_msgs
+Invoked command in '/home/prakrutk/husky_ws/build/husky_msgs' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake /home/prakrutk/husky_ws/src/husky/husky_msgs -DCMAKE_INSTALL_PREFIX=/home/prakrutk/husky_ws/install/husky_msgs
+Invoking command in '/home/prakrutk/husky_ws/build/husky_msgs': CMAKE_PREFIX_PATH=/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --build /home/prakrutk/husky_ws/build/husky_msgs -- -j8 -l8
+Invoked command in '/home/prakrutk/husky_ws/build/husky_msgs' returned '2': CMAKE_PREFIX_PATH=/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --build /home/prakrutk/husky_ws/build/husky_msgs -- -j8 -l8
