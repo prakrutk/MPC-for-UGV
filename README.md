@@ -32,13 +32,13 @@ Model Predictive Control(MPC) for trajectory tracking on Unmanned Ground Vehicle
 ### Dynamics Model:
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Model.png)
 
-#### Notations:
+##### Notations:
 State variable: $ X = (x,y,\psi , \dot x, \dot y, \dot \psi  )$
 
-Input/control variable: $ U = (\delta, \omega )$
+Input/control variable: $U = (\delta, \omega )$
 
 Where, \
-$x,y$ are coordinate of COM of the car in world frame. \
+$x,y$ are coordinates of the COM of the car in world frame. \
 $\psi$ is the heading angle of the car. \
 $\delta$ is the steering angle of the car. \
 $\omega$ is the rotational speed of both the wheels.
@@ -51,7 +51,11 @@ $\beta $ is the sideslip angle of the car. (Not used)
 
 #### Dynamics equation of the car: 
 
-$$ m\ddot x = f_{f_x}cos\delta - f_{f_y}sin\delta + f_{r_x} + m\dot y\dot \psi \\ m\ddot y = f_{f_y}cos\delta + f_{f_x}sin\delta + f_{r_y} - m\dot x\dot \psi \\ I_z\ddot \psi = l_f(f_{f_x}sin\delta + f_{f_y}cos\delta) - f_{r_y}l_r$$
+$$ m\ddot x = f_{f_x}cos\delta - f_{f_y}sin\delta + f_{r_x} + m\dot y\dot \psi$$ 
+
+$$m\ddot y = f_{f_y}cos\delta + f_{f_x}sin\delta + f_{r_y} - m\dot x\dot \psi$$
+
+$$I_z\ddot \psi = l_f(f_{f_x}sin\delta + f_{f_y}cos\delta) - f_{r_y}l_r$$
 
 $C_l$ is the cornering stiffness of the tire. \
 $s_f$ is the slip angle of the front wheel. \
@@ -60,11 +64,6 @@ $c_l$ is the longitudinal stiffness of the tire. \
 $\alpha_f$ is the slip ratio of the front wheel. \
 $\alpha_r$ is the slip ratio of the rear wheel. 
 
-$$f_{f_x} = C_ls_f$$ 
-$$f_{f_y} = C_c\alpha_f$$ 
-$$f_{r_x} = C_ls_r$$ 
-$$f_{r_y} = C_c\alpha_r$$ 
-Assuming small steering angle and small slip angle, the dynamics of the car can be approximated as:
 $$ m\ddot x = C_ls_f - C_c\alpha_f\delta + c_ls_r + m\dot y\dot \psi \\ m\ddot y = C_c\alpha_f + C_ls_f\delta + c_c\alpha_r - m\dot x\dot \psi \\ 
 I_z\ddot \psi = l_f(C_ls_f\delta + C_c\alpha_f) - c_c\alpha_rl_r $$
 
