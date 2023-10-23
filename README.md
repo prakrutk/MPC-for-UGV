@@ -78,6 +78,10 @@ $$m\ddot y = C_c\alpha_f + C_ls_f\delta + c_c\alpha_r - m\dot x\dot \psi $$
 
 $$I_z\ddot \psi = l_f(C_ls_f\delta + C_c\alpha_f) - c_c\alpha_rl_r $$
 
+Also,
+
+$$ \dot y = \dot x(\alpha_f + \delta) - l_f\dot \psi$$
+
 #### MPC Formulation:
 
 $$ \min_{\Delta U, \epsilon } \begin{bmatrix} \Delta U , \epsilon \end{bmatrix}^T H\begin{bmatrix} \Delta U , \epsilon \end{bmatrix} \begin{bmatrix} \Delta U , \epsilon \end{bmatrix} + f\begin{bmatrix} \Delta U , \epsilon \end{bmatrix}$$
