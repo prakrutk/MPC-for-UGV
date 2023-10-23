@@ -1,15 +1,19 @@
 import pybullet as p
 import numpy as np
+import mpc
 import time
 import cvxopt
+import torch
 
 class MPC:
-    def __init__(self, robot_id, goal_state, current_state, horizon, dt):
+    def __init__(self, robot_id, goal_state, current_state, horizon, dt, Nh, Nc):
         self.robot_id = robot_id
         self.goal_state = goal_state
         self.current_state = current_state
         self.horizon = horizon
         self.dt = dt
+        self.Nh = Nh
+        self.Nc = Nc
 
     
     physicsClient = p.connect(p.GUI)
@@ -27,12 +31,13 @@ class MPC:
 
     # Step 2: Define the MPC Controller
     def mpc_controller(self):
+        # Implement the MPC controller here
+        # Use the current state and goal state to compute the control input
+        # Use the MPC horizon and time step to define the optimization problem
 
-        # implement MPC controller here
-        # Generate control inputs based on current state and goal
 
     # Step 3: Define Robot's Dynamics
-    def robot_dynamics():
+    def robot_dynamics(self):
 
 
     # Define the robot's motion equations, constraints, and physics
@@ -46,6 +51,8 @@ class MPC:
     def mpc_optimization(self):
         # Implement the MPC optimization algorithm here
         # Solve for control inputs over a finite time horizon
+        # Use the cost function and robot dynamics to define the optimization problem
+
 
     # Step 6: Simulation Loop
         while True:
