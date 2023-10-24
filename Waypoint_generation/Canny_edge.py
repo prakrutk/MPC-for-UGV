@@ -4,6 +4,15 @@ import cv2
 from moviepy import editor
 import moviepy
 
+# Read the video
+video = cv2.VideoCapture('Waypoint_generation/Test.mp4')
+
+# Take first frame of the video
+ret, frame = video.read()
+
+# implement on every frame
+cv2.imshow('frame', frame)
+cv2.waitKey(0)
 # Read the image
 im = cv2.imread('Waypoint_generation/Test.png')
 cv2.imshow('original', im)
@@ -40,10 +49,10 @@ else:
         ignore_mask_color = 255
 
 rows, cols = canny.shape[:2]
-bottom_left  = [cols * 0.25, rows * 0.95]
-top_left     = [cols * 0.4, rows * 0.8]
+bottom_left  = [cols * 0.1, rows * 0.95]
+top_left     = [cols * 0.5, rows * 0.8]
 bottom_right = [cols * 0.9, rows * 0.95]
-top_right    = [cols * 0.6, rows * 0.8]
+top_right    = [cols * 0.5, rows * 0.8]
 vertices = np.array([[bottom_left, top_left, top_right, bottom_right]], dtype=np.int32)
 
 cv2.fillPoly(mask, vertices, ignore_mask_color)
@@ -54,7 +63,7 @@ rho = 1
     # Angle resolution of the accumulator in radians.
 theta = np.pi/180   
 # Only lines that are greater than threshold will be returned.
-threshold = 20      
+threshold = 25      
 # Line segments shorter than that are rejected.
 minLineLength = 20  
 # Maximum allowed gap between points on the same line to link them
