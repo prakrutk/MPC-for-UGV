@@ -50,9 +50,9 @@ else:
 
 rows, cols = canny.shape[:2]
 bottom_left  = [cols * 0.1, rows * 0.95]
-top_left     = [cols * 0.5, rows * 0.8]
+top_left     = [cols * 0.6, rows * 0.8]
 bottom_right = [cols * 0.9, rows * 0.95]
-top_right    = [cols * 0.5, rows * 0.8]
+top_right    = [cols * 0.6, rows * 0.8]
 vertices = np.array([[bottom_left, top_left, top_right, bottom_right]], dtype=np.int32)
 
 cv2.fillPoly(mask, vertices, ignore_mask_color)
@@ -63,7 +63,7 @@ rho = 1
     # Angle resolution of the accumulator in radians.
 theta = np.pi/180   
 # Only lines that are greater than threshold will be returned.
-threshold = 25      
+threshold = 20      
 # Line segments shorter than that are rejected.
 minLineLength = 20  
 # Maximum allowed gap between points on the same line to link them
