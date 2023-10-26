@@ -4,15 +4,6 @@ import cv2
 from moviepy import editor
 import moviepy
 
-# Read the video
-video = cv2.VideoCapture('Waypoint_generation/Test.mp4')
-
-# Take first frame of the video
-ret, frame = video.read()
-
-# implement on every frame
-cv2.imshow('frame', frame)
-cv2.waitKey(0)
 # Read the image
 im = cv2.imread('Waypoint_generation/Test.png')
 cv2.imshow('original', im)
@@ -49,8 +40,8 @@ else:
         ignore_mask_color = 255
 
 rows, cols = canny.shape[:2]
-bottom_left  = [cols * 0.1, rows * 0.95]
-top_left     = [cols * 0.6, rows * 0.8]
+bottom_left  = [cols * 0.25, rows * 0.95]
+top_left     = [cols * 0.4, rows * 0.8]
 bottom_right = [cols * 0.9, rows * 0.95]
 top_right    = [cols * 0.6, rows * 0.8]
 vertices = np.array([[bottom_left, top_left, top_right, bottom_right]], dtype=np.int32)
