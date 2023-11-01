@@ -36,12 +36,16 @@ p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall3Id,basePosition=[-3.5,
 p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall4Id,basePosition=[1, -1.5, 0.5])
 p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall3Id,basePosition=[3.5, 2, 0.5],baseOrientation=p.getQuaternionFromEuler([0,0,67.55]))
 
-car = p.loadURDF("racecar/racecar_differential.urdf",[-4,4,0])  #, [0,0,2],useFixedBase=True)
+car = p.loadURDF("racecar/racecar_differential.urdf",[-4,4,1])  #, [0,0,2],useFixedBase=True)
 for i in range(p.getNumJoints(car)):
   print(p.getJointInfo(car, i))
 for wheel in range(p.getNumJoints(car)):
   p.setJointMotorControl2(car, wheel, p.VELOCITY_CONTROL, targetVelocity=0, force=0)
   p.getJointInfo(car, wheel)
+
+for i in range(100):
+  p.stepSimulation()
+  time.sleep(1. / 240.)
 
 wheels = [8, 15]
 print("----------------")
