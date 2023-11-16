@@ -7,8 +7,8 @@ from typing import Sequence
 class dynamics:
     state: Sequence[float]
     input: Sequence[float]
-    ur: Sequence[float]
-    xr: Sequence[float]
+    inputr: Sequence[float]
+    stater: Sequence[float]
     cl: int
     sf: int
     cc: int
@@ -44,8 +44,8 @@ class dynamics:
         return psiddot
     
     def A(self, x, u):
-        xr = self.xr
-        ur = self.ur
+        xr = self.stater
+        ur = self.inputr
         a1 = grad(self.f1, 0)(xr, ur)
         a2 = grad(self.f2, 0)(xr, ur)
         a3 = grad(self.f3, 0)(xr, ur)
@@ -69,10 +69,13 @@ class dynamics:
         B = jnp.concatenate((b1,b2,b3,b4,b5,b6), axis=1)
         return B
 
+    def eqn(self, x, u):
+        xr = self.stater
+        ur = self.inputr
+        return self.A(xr, ur)*x + self.B(xr, ur)*u
+
     def C(self, x, u):
         C = jnp.array([[1.0, 0.0, 0.0, 0.0, 0.0],[0.0,1.0,0.0,0.0,0.0],[0.0,0.0,1.0,0.0,0.0,0.0]])
     # C = jnp.array([[1.0, 0.0, 0.0, 0.0, 0.0],[0.0,1.0,0.0,0.0,0.0],[0.0,0.0,1.0,0.0,0.0,0.0]])
     # eeta = C*state
 
-def eqn(xr, ur, x,u):
-    return dynamics.A(xr,ur)*x+dynamics.B(xr,ur)*u
