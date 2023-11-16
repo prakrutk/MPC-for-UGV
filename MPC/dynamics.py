@@ -9,6 +9,7 @@ class dynamics:
     input: Sequence[float]
     inputr: Sequence[float]
     stater: Sequence[float]
+    delu: Sequence[float]
     cl: float
     sf: float
     cc: float
@@ -102,7 +103,15 @@ class dynamics:
         phi = jnp.array([])
         A_p, B_p = self.pri()
         for i in range(self.Nc):
-            phi = jnp.concatenate(phi,self,jnp.power(A_p,(i))*B_p,axis=0)
+            row = jnp.zeros(1,self.Nc)
+            for j in range(i):
+                row[j] = jnp.power(A_p,(j))*B_p
+            phi = jnp.concatenate(phi,row,axis=0)
+        return phi
+    
+    def Y(self):
+        Y = self.C*(self.theta*jnp.concatenate(self.state-self.stater,self.input-self.inputr,axis=0) + self.phi*self.delu)
+        return Y
     
     
 
