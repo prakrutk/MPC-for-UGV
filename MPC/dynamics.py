@@ -2,23 +2,22 @@ import jax.numpy as jnp
 from jax import grad, jit, vmap
 from jax import random
 from flax import struct
+from typing import Sequence
 
 class dynamics:
-
-    def __init__(self, state, input, ur, xr, cl, sf, cc, sr, m, alphaf, lf, lr, iz):
-        self.state = state
-        self.input = input
-        self.ur = ur
-        self.xr = xr
-        self.cl = cl
-        self.sf = sf
-        self.cc = cc
-        self.sr = sr
-        self.m = m
-        self.alphaf = alphaf
-        self.lf = lf
-        self.lr = lr
-        self.iz = iz
+    state: Sequence[float]
+    input: Sequence[float]
+    ur: Sequence[float]
+    xr: Sequence[float]
+    cl: int
+    sf: int
+    cc: int
+    sr: int
+    m: int
+    alphaf: int
+    lf: int
+    lr: int
+    iz: int
     
     def f1(self, x, u):
         xdot = jnp.sum(u[0])
@@ -74,3 +73,6 @@ class dynamics:
         C = jnp.array([[1.0, 0.0, 0.0, 0.0, 0.0],[0.0,1.0,0.0,0.0,0.0],[0.0,0.0,1.0,0.0,0.0,0.0]])
     # C = jnp.array([[1.0, 0.0, 0.0, 0.0, 0.0],[0.0,1.0,0.0,0.0,0.0],[0.0,0.0,1.0,0.0,0.0,0.0]])
     # eeta = C*state
+
+def eqn(xr, ur, x,u):
+    return dynamics.A(xr,ur)*x+dynamics.B(xr,ur)*u
