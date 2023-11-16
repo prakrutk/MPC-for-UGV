@@ -9,15 +9,18 @@ class dynamics:
     input: Sequence[float]
     inputr: Sequence[float]
     stater: Sequence[float]
-    cl: int
-    sf: int
-    cc: int
-    sr: int
-    m: int
-    alphaf: int
-    lf: int
-    lr: int
-    iz: int
+    cl: float
+    sf: float
+    cc: float
+    sr: float
+    m: float
+    alphaf: float
+    lf: float
+    lr: float
+    iz: float
+    T: float
+    Nc: int
+    Np: int
     
     def f1(self, x, u):
         xdot = jnp.sum(u[0])
@@ -53,7 +56,7 @@ class dynamics:
         a5 = grad(self.f5, 0)(xr, ur)
         a6 = grad(self.f6, 0)(xr, ur)
 
-        A = jnp.concatenate((a1,a2,a3,a4,a5,a6), axis=1)
+        A = jnp.identity(6) + self.T*jnp.concatenate((a1,a2,a3,a4,a5,a6), axis=1)
         return A
     
     def B(self, x, u):
@@ -66,16 +69,40 @@ class dynamics:
         b5 = grad(self.f5, 1)(xr, ur)
         b6 = grad(self.f6, 1)(xr, ur)
 
-        B = jnp.concatenate((b1,b2,b3,b4,b5,b6), axis=1)
+        B = self.T*jnp.concatenate((b1,b2,b3,b4,b5,b6), axis=1)
         return B
+    
+    def pri(self):
+        xr = self.stater
+        ur = self.inputr
+        A_p1 = jnp.concatenate((self.A(xr, ur), self.B(xr, ur)), axis=1)
+        A_p2 = jnp.concatenate((jnp.zeros((2,6)), jnp.identity(2)), axis=1)
+        A_p = jnp.concatenate((A_p1, A_p2), axis=0)
+
+        B_p = jnp.concatenate((self.B(xr, ur), jnp.identity(2)), axis=0)
+        return A_p,B_p
 
     def eqn(self, x, u):
         xr = self.stater
         ur = self.inputr
-        return self.A(xr, ur)*x + self.B(xr, ur)*u
+        return self.A(xr, ur)*(x -xr) + self.B(xr, ur)*(u - ur)
 
     def C(self, x, u):
-        C = jnp.array([[1.0, 0.0, 0.0, 0.0, 0.0],[0.0,1.0,0.0,0.0,0.0],[0.0,0.0,1.0,0.0,0.0,0.0]])
-    # C = jnp.array([[1.0, 0.0, 0.0, 0.0, 0.0],[0.0,1.0,0.0,0.0,0.0],[0.0,0.0,1.0,0.0,0.0,0.0]])
-    # eeta = C*state
+        C = jnp.array([[1.0,0.0,0.0,0.0,0.0],[0.0,1.0,0.0,0.0,0.0],[0.0,0.0,1.0,0.0,0.0,0.0]])
+        return jnp.concatenate(C,jnp.zeros((3,2)),axis=1)
+    
+    def theta(self):
+        the = jnp.array([])
+        A_p, B_p = self.pri()
+        for i in range(self.Np-1):
+            the = jnp.concatenate(the,jnp.power(A_p,(i+1)),axis=0)
+        return the
+    
+    def phi(self):
+        phi = jnp.array([])
+        A_p, B_p = self.pri()
+        for i in range(self.Nc):
+            phi = jnp.concatenate(phi,self,jnp.power(A_p,(i))*B_p,axis=0)
+    
+    
 
