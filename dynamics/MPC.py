@@ -1,19 +1,19 @@
 import jax.numpy as jnp
-from MPC.dynamics import dynamics, eqn
+from dynamics.cardynamics import dynamics
 
 Nc = 5
 Np = 10
 initial_state = jnp.array([0,0,0,0,0,0,0,0])
-x = jnp.array([0,0,0,0,0,0])
-u = jnp.array([0,0])
-xr = jnp.array([0,0,0,0,0,0])
-ur = jnp.array([0,0])
-delu = 0.1*jnp.ones((Nc,2))
-Yreff = jnp.ones((Np,3))
+x = jnp.array([0.0,0.0,0.0,0.0,0.0,0.0])
+u = jnp.array([0.0,0.0])
+xr = jnp.array([0.0,0.0,0.0,0.0,0.0,0.0])
+ur = jnp.array([0.0,0.0])
+delu = 0.1*jnp.ones((2*Nc,1))
+Yreff = jnp.ones((3*Np,1))
 Q = 100*jnp.identity(6)
 R = 10*jnp.identity(2)
 coeff = dynamics(state = x
-                 ,input = u
+                ,input = u
                 ,inputr = ur
                 ,stater = xr
                 ,delu = delu
@@ -30,6 +30,6 @@ coeff = dynamics(state = x
                 ,Nc = Nc
                 ,Np = Np)
 
-Ynext = coeff.Y()
+Ynext = coeff.Y(x,u)
 E = coeff.theta()*jnp.concatenate(x-xr,u-ur,axis=0)- Yreff
 
