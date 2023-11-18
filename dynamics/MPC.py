@@ -31,5 +31,5 @@ coeff = dynamics(state = x
                 ,Np = Np)
 
 Ynext = coeff.Y(x,u)
-E = coeff.theta()*jnp.concatenate(x-xr,u-ur,axis=0)- Yreff
+E = coeff.phi().dot(jnp.concatenate((x-xr,u-ur),axis=0))- Yreff
 

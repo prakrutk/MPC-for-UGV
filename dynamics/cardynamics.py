@@ -92,25 +92,27 @@ class dynamics(struct.PyTreeNode):
 
     def C(self, x, u):
         C = jnp.array([[1.0,0.0,0.0],[0.0,1.0,0.0],[0.0,0.0,1.0]])
-        C = jnp.concatenate((C,jnp.zeros((3,3))),axis=0)
-        return jnp.concatenate((C,jnp.zeros((6,3))),axis=1)
+        C = jnp.concatenate((C,jnp.zeros((5,3))),axis=0)
+        return jnp.concatenate((C,jnp.zeros((8,5))),axis=1)
     
     def phi(self):
         phi = jnp.zeros((8,8))
         A_p, B_p = self.pri()
-        phi = A_p
+        C_p = self.C(self.stater, self.inputr)
+        phi = C_p.dot(A_p)
         for i in range(self.Np-2):
-            phi = np.append(phi,jnp.power(A_p,(i+2)),axis=0)
+            phi = np.append(phi,C_p.dot(jnp.power(A_p,(i+2))),axis=0)
         return phi
     
     def theta(self):
         the = jnp.zeros((8,2))
         A_p, B_p = self.pri()
+        C_p = self.C(self.stater, self.inputr)
         row = np.zeros((8,self.Nc*2))
         for i in range(self.Nc-1):
             for j in range(self.Nc-1):
                 if j<=i:
-                    row[:,2*j:2*j+2] = np.power(A_p,(i-j)).dot(B_p) 
+                    row[:,2*j:2*j+2] = C_p.dot(np.power(A_p,(i-j)).dot(B_p)) 
                 else:
                     row[:,2*j:2*j+2] = jnp.zeros((8,2))
             if i==0:
@@ -124,6 +126,7 @@ class dynamics(struct.PyTreeNode):
         inputd = self.input - self.inputr
         print(jnp.concatenate((stated,inputd),axis=0).shape)
         Y1 = self.phi()*jnp.concatenate((stated,inputd),axis=0) 
-        Y2=  self.theta().dot(self.delu)
+        Y2 = self.theta().dot(self.delu)
+        Y2 = np.append(Y2,jnp.zeros(((Y1.shape[0] - Y2.shape[0]),1)),axis=0)
         Y = Y1 + Y2
         return Y
