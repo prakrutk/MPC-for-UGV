@@ -122,5 +122,5 @@ Then go into the directory and install the package using pip: \
 ``` pip install -r requirements.txt``` 
 
 To run MPC code: \
-``` python3 dynamics/MPC.py```
+``` python3 dynamics/MPC.py``` (disclaimer: Only dynamics part written till now)
 
