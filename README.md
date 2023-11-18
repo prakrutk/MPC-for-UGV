@@ -105,21 +105,21 @@ $$Y = \Phi_{X(t|t)} + \Theta \Delta U(t)$$
 ### Setup:
 This is the setup for ubuntu(22.04). Not sure how it works on Windows/Mac.
 
-\textbf{(Recommended)} Make a seperate conda environment and install the package in that environment: \\
-``` conda create -n FOR_Project python=3.8``` \\
-``` conda activate FOR_Project ``` \\ 
+\textbf{(Recommended)} Make a seperate conda environment and install the package in that environment: \
+``` conda create -n FOR_Project python=3.8``` \
+``` conda activate FOR_Project ``` \
 
-First clone the repository: \\
-``` git clone https://github.com/prakrutk/FOR_Project.git```\\
+First clone the repository: \
+``` git clone https://github.com/prakrutk/FOR_Project.git```\
 
-Checkout to the branch named 'Prakrut': \\ 
+Checkout to the branch named 'Prakrut': \
 ``` git checkout Prakrut```
 
-Then go into the directory and install the package using pip: \\ 
-``` cd FOR_Project``` \\
-``` pip install --upgrade pip``` \\
-``` pip install -e .``` \\
-``` pip install -r requirements.txt``` \\
+Then go into the directory and install the package using pip: \
+``` cd FOR_Project``` \
+``` pip install --upgrade pip``` \
+``` pip install -e .``` \
+``` pip install -r requirements.txt``` \
 
 To run MPC code
 ``` python3 dynamics/MPC.py```
