@@ -1,11 +1,6 @@
 Metadata-Version: 2.1
 Name: MPC
-Version: 0.1.0
+Version: 0.0.1
 Summary: Model Predictive Control
-Home-page: UNKNOWN
 Author: Prakrut Kotecha
-License: UNKNOWN
-Platform: UNKNOWN
-
-UNKNOWN
-
+Requires-Python: >=3.8

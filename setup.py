@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-VERSION = '0.1.0'
+VERSION = '0.0.1'
 
 INSTALL_REQUIRES = (
     [
@@ -9,6 +9,8 @@ INSTALL_REQUIRES = (
         'jax',
         'pybullet',
         'matplotlib',
+        'cvxpy',
+        'cv2',
     ]
 )
 
@@ -19,5 +21,6 @@ setup(
     author='Prakrut Kotecha',
     Install_requires=INSTALL_REQUIRES,
     packages=find_packages(),
+    python_requires='>=3.8',
     zip_safe=False,
 )

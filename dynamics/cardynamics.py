@@ -124,7 +124,6 @@ class dynamics(struct.PyTreeNode):
     def Y(self,x,u):
         stated = self.state - self.stater
         inputd = self.input - self.inputr
-        print(jnp.concatenate((stated,inputd),axis=0).shape)
         Y1 = self.phi()*jnp.concatenate((stated,inputd),axis=0) 
         Y2 = self.theta().dot(self.delu)
         Y2 = np.append(Y2,jnp.zeros(((Y1.shape[0] - Y2.shape[0]),1)),axis=0)

@@ -1,5 +1,6 @@
 import jax.numpy as jnp
 from dynamics.cardynamics import dynamics
+import cvxpy as cvx
 
 Nc = 5
 Np = 10
@@ -12,6 +13,8 @@ delu = 0.1*jnp.ones((2*Nc,1))
 Yreff = jnp.ones((3*Np,1))
 Q = 100*jnp.identity(6)
 R = 10*jnp.identity(2)
+rho = 1
+epi = 0
 coeff = dynamics(state = x
                 ,input = u
                 ,inputr = ur
@@ -32,4 +35,23 @@ coeff = dynamics(state = x
 
 Ynext = coeff.Y(x,u)
 E = coeff.phi().dot(jnp.concatenate((x-xr,u-ur),axis=0))- Yreff
+print('successfully executed')
 
+# def linearmpc(x,u):
+#     u = cvx.Variable((2*Nc +1,1))
+
+#     cost = 0.0
+#     constraints = []
+
+#     for k in range(Nc):
+#         cost += cvx.quad_form(E[:,k],Q)
+#         cost += cvx.quad_form(u[:,k],R)
+#         constraints += [Ynext[:,k] == coeff.Y(x,u)]
+#         constraints += [u[:,k] <= 0.5]
+#         constraints += [u[:,k] >= -0.5]
+    
+#     prob = cvx.Problem(cvx.Minimize(cost), constraints)
+#     prob.solve()
+#     return u.value
+
+# print(linearmpc(x,u))
