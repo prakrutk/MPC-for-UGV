@@ -124,3 +124,6 @@ Then go into the directory and install the package using pip: \
 To run MPC code: \
 ``` python3 dynamics/MPC.py``` (disclaimer: Only dynamics part written till now)
 
+To run Waypoint generation code: \
+``` python3 Waypoint_generation/Waypoint_new.py```
+

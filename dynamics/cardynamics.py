@@ -58,8 +58,6 @@ class dynamics(struct.PyTreeNode):
         a5 = grad(self.f5, 0)(xr, ur)
         a6 = grad(self.f6, 0)(xr, ur)
         A = jnp.identity(6) + self.T*np.stack((a1,a2,a3,a4,a5,a6), axis=1)
-        # A = np.concatenate((a1,a2,a3,a4,a5,a6), axis=1)
-        # print(A)
         return A
     
     def B(self, x, u):
@@ -92,11 +90,11 @@ class dynamics(struct.PyTreeNode):
 
     def C(self, x, u):
         C = jnp.array([[1.0,0.0,0.0],[0.0,1.0,0.0],[0.0,0.0,1.0]])
-        C = jnp.concatenate((C,jnp.zeros((5,3))),axis=0)
-        return jnp.concatenate((C,jnp.zeros((8,5))),axis=1)
+        C = jnp.concatenate((C,jnp.zeros((3,5))),axis=1)
+        return C
     
     def phi(self):
-        phi = jnp.zeros((8,8))
+        phi = jnp.zeros((3,8))
         A_p, B_p = self.pri()
         C_p = self.C(self.stater, self.inputr)
         phi = C_p.dot(A_p)
@@ -108,13 +106,13 @@ class dynamics(struct.PyTreeNode):
         the = jnp.zeros((8,2))
         A_p, B_p = self.pri()
         C_p = self.C(self.stater, self.inputr)
-        row = np.zeros((8,self.Nc*2))
+        row = np.zeros((3,self.Nc*2))
         for i in range(self.Nc-1):
             for j in range(self.Nc-1):
                 if j<=i:
                     row[:,2*j:2*j+2] = C_p.dot(np.power(A_p,(i-j)).dot(B_p)) 
                 else:
-                    row[:,2*j:2*j+2] = jnp.zeros((8,2))
+                    row[:,2*j:2*j+2] = jnp.zeros((3,2))
             if i==0:
                 the = row
             else:    
