@@ -112,9 +112,6 @@ This is the setup for ubuntu(22.04). Not sure how it works on Windows/Mac.
 First clone the repository: \
 ``` git clone https://github.com/prakrutk/FOR_Project.git```
 
-Checkout to the branch named 'Prakrut': \
-``` git checkout Prakrut```
-
 Then go into the directory and install the package using pip: \
 ``` cd FOR_Project``` \
 ``` pip install --upgrade pip``` \
