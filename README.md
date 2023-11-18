@@ -107,7 +107,7 @@ This is the setup for ubuntu(22.04). Not sure how it works on Windows/Mac.
 
 **(Recommended)** Make a seperate conda environment and install the package in that environment: \
 ``` conda create -n FOR_Project python=3.8``` \
-``` conda activate FOR_Project ``` 
+``` conda activate FOR_Project``` 
 
 First clone the repository: \
 ``` git clone https://github.com/prakrutk/FOR_Project.git```
