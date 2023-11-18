@@ -1,9 +1,0 @@
-/home/prakrutk/husky_ws/build/husky_desktop/CMakeFiles/uninstall.dir
-/home/prakrutk/husky_ws/build/husky_desktop/CMakeFiles/husky_desktop_uninstall.dir
-/home/prakrutk/husky_ws/build/husky_desktop/CMakeFiles/test.dir
-/home/prakrutk/husky_ws/build/husky_desktop/CMakeFiles/edit_cache.dir
-/home/prakrutk/husky_ws/build/husky_desktop/CMakeFiles/rebuild_cache.dir
-/home/prakrutk/husky_ws/build/husky_desktop/CMakeFiles/list_install_components.dir
-/home/prakrutk/husky_ws/build/husky_desktop/CMakeFiles/install.dir
-/home/prakrutk/husky_ws/build/husky_desktop/CMakeFiles/install/local.dir
-/home/prakrutk/husky_ws/build/husky_desktop/CMakeFiles/install/strip.dir

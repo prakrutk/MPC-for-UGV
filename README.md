@@ -58,11 +58,11 @@ $$m\ddot y = f_{f_y}cos\delta + f_{f_x}sin\delta + f_{r_y} - m\dot x\dot \psi$$
 $$I_z\ddot \psi = l_f(f_{f_x}sin\delta + f_{f_y}cos\delta) - f_{r_y}l_r$$
 
 $C_l$ is the cornering stiffness of the tire. \
-$s_f$ is the slip angle of the front wheel. \
-$s_r$ is the slip angle of the rear wheel. \
+$s_f$ is the slip ratio of the front wheel. \
+$s_r$ is the slip ratio of the rear wheel. \
 $c_l$ is the longitudinal stiffness of the tire. \
-$\alpha_f$ is the slip ratio of the front wheel. \
-$\alpha_r$ is the slip ratio of the rear wheel. 
+$\alpha_f$ is the slip angle of the front wheel. \
+$\alpha_r$ is the slip angle of the rear wheel. 
 
 Assuming small slip angle and small slip ratio, the forces acting on the car can be written as:
 
@@ -78,6 +78,10 @@ $$m\ddot y = C_c\alpha_f + C_ls_f\delta + c_c\alpha_r - m\dot x\dot \psi $$
 
 $$I_z\ddot \psi = l_f(C_ls_f\delta + C_c\alpha_f) - c_c\alpha_rl_r $$
 
+Also,
+
+$$ \dot y = \dot x(\alpha_f + \delta) - l_f\dot \psi$$
+
 #### MPC Formulation:
 
 $$ \min_{\Delta U, \epsilon } \begin{bmatrix} \Delta U , \epsilon \end{bmatrix}^T H\begin{bmatrix} \Delta U , \epsilon \end{bmatrix} \begin{bmatrix} \Delta U , \epsilon \end{bmatrix} + f\begin{bmatrix} \Delta U , \epsilon \end{bmatrix}$$
@@ -90,10 +94,36 @@ $$ Y_{min} - \epsilon \leq \Phi_{X(t|t)} + \Theta \Delta U(t) \leq Y_{max} + \ep
 
 Where: 
 
-$$H = \begin{bmatrix} \Theta ^T Q \Theta + R & 0 \\ 0 & \rho \end{bmatrix}$$
+$$H = \begin{bmatrix} \Theta ^T Q \Theta + R & 0 \\\\ 0 & \rho \end{bmatrix}$$
 
 $$f = \begin{bmatrix} 2E^TQ\Theta & 0\end{bmatrix}$$
 
 $$\epsilon = \text{Slack variable} $$
 
 $$Y = \Phi_{X(t|t)} + \Theta \Delta U(t)$$
+
+### Setup:
+This is the setup for ubuntu(22.04). Not sure how it works on Windows/Mac.
+
+**(Recommended)** Make a seperate conda environment and install the package in that environment: \
+``` conda create -n FOR_Project python=3.8``` \
+``` conda activate FOR_Project``` 
+
+First clone the repository: \
+``` git clone https://github.com/prakrutk/FOR_Project.git```
+
+Checkout to the branch named 'Prakrut': \
+``` git checkout Prakrut```
+
+Then go into the directory and install the package using pip: \
+``` cd FOR_Project``` \
+``` pip install --upgrade pip``` \
+``` pip install -e .``` \
+``` pip install -r requirements.txt``` 
+
+To run MPC code: \
+``` python3 dynamics/MPC.py``` (disclaimer: Only dynamics part written till now)
+
+To run Waypoint generation code: \
+``` python3 Waypoint_generation/Waypoint_new.py```
+
