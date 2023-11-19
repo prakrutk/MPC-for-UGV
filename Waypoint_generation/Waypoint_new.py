@@ -8,6 +8,12 @@ import numpy as np
 vidcap = cv2.VideoCapture("Waypoint_generation/Test.mp4")
 success, image = vidcap.read()
 
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+input = cv2.VideoWriter('Waypoint_generation/input.mp4', fourcc, 60.0, (640,480))
+
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+out = cv2.VideoWriter('Waypoint_generation/output.mp4', fourcc, 60.0, (640,480))
+
 def nothing(x):
     pass
 
@@ -79,13 +85,16 @@ while success:
 
 
     cv2.imshow("Original", frame)
+    input.write(frame)
     cv2.imshow("Bird's Eye View", transformed_frame)
+    out.write(transformed_frame)
     cv2.imshow("Lane Detection - Image Thresholding", mask)
 
     if cv2.waitKey(10) == 27:
         break
 
     success, image = vidcap.read()  # Read the next frame
-
+input.release()
+out.release()
 cv2.destroyAllWindows()
 

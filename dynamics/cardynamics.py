@@ -98,7 +98,7 @@ class dynamics(struct.PyTreeNode):
         A_p, B_p = self.pri()
         C_p = self.C(self.stater, self.inputr)
         phi = C_p.dot(A_p)
-        for i in range(self.Np-2):
+        for i in range(self.Np-1):
             phi = np.append(phi,C_p.dot(jnp.power(A_p,(i+2))),axis=0)
         return phi
     
@@ -107,8 +107,8 @@ class dynamics(struct.PyTreeNode):
         A_p, B_p = self.pri()
         C_p = self.C(self.stater, self.inputr)
         row = np.zeros((3,self.Nc*2))
-        for i in range(self.Nc-1):
-            for j in range(self.Nc-1):
+        for i in range(self.Nc):
+            for j in range(self.Nc):
                 if j<=i:
                     row[:,2*j:2*j+2] = C_p.dot(np.power(A_p,(i-j)).dot(B_p)) 
                 else:
@@ -117,12 +117,13 @@ class dynamics(struct.PyTreeNode):
                 the = row
             else:    
                 the = np.append(the,row,axis=0)
+        
         return the
     
     def Y(self,x,u):
         stated = self.state - self.stater
         inputd = self.input - self.inputr
-        Y1 = self.phi()*jnp.concatenate((stated,inputd),axis=0) 
+        Y1 = self.phi().dot(jnp.concatenate((stated,inputd),axis=0)).reshape((3*self.Np,1)) 
         Y2 = self.theta().dot(self.delu)
         Y2 = np.append(Y2,jnp.zeros(((Y1.shape[0] - Y2.shape[0]),1)),axis=0)
         Y = Y1 + Y2
