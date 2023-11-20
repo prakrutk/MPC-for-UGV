@@ -5,6 +5,7 @@ from jax import random
 from flax import struct
 from typing import Sequence
 
+@jit
 class dynamics(struct.PyTreeNode):
     state: Sequence[float]
     input: Sequence[float]
