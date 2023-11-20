@@ -5,7 +5,7 @@
 ## Problem Statement:
 Model Predictive Control(MPC) for trajectory tracking on Unmanned Ground Vehicle (UGV) with waypoint generation in unknown environment using perception. 
 
-#### Possible Extensions:  
+#### Possible Extensions: (Maybe some day in future :P)  
 1. Dynamic obstacle avoidance
 2. Implementation and demonstration on hardware
 
