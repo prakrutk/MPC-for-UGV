@@ -14,6 +14,7 @@ input = cv2.VideoWriter('Waypoint_generation/input.mp4', fourcc, 60.0, (640,480)
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 out = cv2.VideoWriter('Waypoint_generation/output.mp4', fourcc, 60.0, (640,480))
 
+
 def nothing(x):
     pass
 
@@ -59,8 +60,8 @@ while success:
     u_s = cv2.getTrackbarPos("U - S", "Trackbars")
     u_v = cv2.getTrackbarPos("U - V", "Trackbars")
 
-    lower = np.array([l_h, l_s, l_v])
-    upper = np.array([u_h, u_s, u_v])
+    lower = np.array([110, 225, l_v])
+    upper = np.array([225, u_s, 225])
     mask = cv2.inRange(hsv_transformed_frame, lower, upper)
 
     ### Hough Transform for Lane Detection
@@ -84,16 +85,17 @@ while success:
         cv2.circle(transformed_frame, (midpoint, 240), 5, (255, 0, 0), -1)  # Draw a blue circle at the default midpoint
 
 
-    cv2.imshow("Original", frame)
+    # cv2.imshow("Original", frame)
     input.write(frame)
     cv2.imshow("Bird's Eye View", transformed_frame)
     out.write(transformed_frame)
-    cv2.imshow("Lane Detection - Image Thresholding", mask)
+    # cv2.imshow("Lane Detection - Image Thresholding", mask)
 
     if cv2.waitKey(10) == 27:
         break
 
     success, image = vidcap.read()  # Read the next frame
+
 input.release()
 out.release()
 cv2.destroyAllWindows()

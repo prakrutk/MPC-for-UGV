@@ -4,3 +4,4 @@ jaxlib
 flax
 cvxpy
 opencv-python
+pybullet

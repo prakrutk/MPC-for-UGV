@@ -122,7 +122,7 @@ Then go into the directory and install the package using pip: \
 ``` pip install -r requirements.txt``` 
 
 To run MPC code: \
-``` python3 dynamics/MPC.py``` (disclaimer: Only dynamics part written till now)
+``` python3 dynamics/MPC.py``` (disclaimer: Something is working now we have to figure out what exactly is working)
 
 To run Waypoint generation code: \
 ``` python3 Waypoint_generation/Waypoint_new.py```
