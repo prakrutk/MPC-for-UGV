@@ -50,8 +50,7 @@ coeff = dynamics(state = x_t
                 ,Np = Np)
 
 Ynext = coeff.Y(x_t,u_t)
-E = coeff.phi().dot(jnp.concatenate((x_t-xr,u_t-ur),axis=0)).reshape(3*Np,1) - Yreff
-print('E=',E)
+
 
 def linearmpc(x,u_t):
     u = cvx.Variable((2*Nc +1,1))
@@ -64,7 +63,12 @@ def linearmpc(x,u_t):
     c = jnp.zeros((H.shape[0],1))
     c = c.at[-1].set(rho)
     H = jnp.append(H,c,axis=1)
-    cost += cvx.quad_form(u,H) + jnp.transpose(E).dot(Q).dot(the_c)@u[0:2*Nc,:]
+    E = coeff.phi().dot(jnp.concatenate((x_t-xr,u_t-ur),axis=0)).reshape(3*Np,1) - Yreff
+    # print('E=',E)
+    cost += cvx.quad_form(u,H) + jnp.transpose(E
+                                               
+                                               
+                                               ).dot(Q).dot(the_c)@u[0:2*Nc,:]
     for k in range(2*Nc):
         constraints += [u[k,:] <= 0.5]
         constraints += [u[k,:] >= -0.5]
@@ -119,7 +123,7 @@ def simulate(initial_state,goal):
         for i in range(Nc):
             # x,phi = pyconnect(2*u[2*i,0],u[2*i+1,0],wheels,car,useRealTimeSim)
             x,phi = pybullet_dynamics.loop(2*u[2*i,0],20,u[2*i+1,0],wheels,cars,distance)
-        state = jnp.array([x[0],x[1],x[-1],0,0,0])
+        state = jnp.array([x[0],x[1],phi[-1],0,0,0])
         x_t = state
         time += 0.1
         i +=1
