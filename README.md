@@ -80,7 +80,9 @@ $$I_z\ddot \psi = l_f(C_ls_f\delta + C_c\alpha_f) - c_c\alpha_rl_r $$
 
 Also,
 
+$$ \dot x = V$$
 $$ \dot y = \dot x(\alpha_f + \delta) - l_f\dot \psi$$
+$$ \dot \psi = \frac{\dot y}{l_r}$$
 
 #### MPC Formulation:
 
