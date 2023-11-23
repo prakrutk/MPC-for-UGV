@@ -88,11 +88,11 @@ $$ \dot \psi = \frac{\dot y}{l_r} $$
 
 #### Linearized Dynamics equation of the car:
 
-$$ \dot X = AX + BU $$
+$$ \dot \Epsilon = A\Epsilon + BU $$
 
-where, $X$ is the state variable and $U$ is the control variable.
+where, $\Epsilon$ is the state variable and $U$ is the control variable.
 
-$$X = \begin{bmatrix} x,y,\phi,\dot x,\dot y, \dot \phi \end{bmatrix}$$
+$$\Epsilon = \begin{bmatrix} x,y,\phi,\dot x,\dot y, \dot \phi \end{bmatrix}$$
 
 $$U = \begin{bmatrix} V, \delta \end{bmatrix}$$
 
@@ -115,6 +115,16 @@ $$f = \begin{bmatrix} 2E^TQ\Theta & 0\end{bmatrix}$$
 $$\epsilon = \text{Slack variable} $$
 
 $$Y = \Phi_{X(t|t)} + \Theta \Delta U(t)$$
+
+#### Stacking the states and inputs:
+
+$$\Epsilon = \begin{bmatrix} x,y,\phi,\dot x,\dot y, \dot \phi \end{bmatrix}$$
+
+$$U = \begin{bmatrix} V, \delta \end{bmatrix}$$
+
+$$\Delta U = \begin{bmatrix} \Delta V, \Delta \delta \end{bmatrix}$$
+
+$$\X = \begin{bmatrix} \Epsilon, U \end{bmatrix} $$
 
 ### Setup:
 This is the setup for ubuntu(22.04). Not sure how it works on Windows/Mac.
