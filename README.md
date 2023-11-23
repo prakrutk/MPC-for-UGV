@@ -86,6 +86,14 @@ $$ \dot y = \dot x(\alpha_f + \delta) - l_f\dot \psi $$
 
 $$ \dot \psi = \frac{\dot y}{l_r} $$
 
+#### Linearized Dynamics equation of the car:
+
+$$ \dot X = AX + BU $$
+
+where, $X$ is the state variable and $U$ is the control variable.
+$$X = \begin{bmatrix} x,y,\phi,\dot x,\dot y, \dot \phi \end{bmatrix}$$
+$$U = \begin{bmatrix} V, \delta \end{bmatrix}$$
+
 #### MPC Formulation:
 
 $$ \min_{\Delta U, \epsilon } \begin{bmatrix} \Delta U , \epsilon \end{bmatrix}^T H\begin{bmatrix} \Delta U , \epsilon \end{bmatrix} \begin{bmatrix} \Delta U , \epsilon \end{bmatrix} + f\begin{bmatrix} \Delta U , \epsilon \end{bmatrix}$$
