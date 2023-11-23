@@ -86,7 +86,7 @@ $$ \dot y = \dot x(\alpha_f + \delta) - l_f\dot \psi $$
 
 $$ \dot \psi = \frac{\dot y}{l_r} $$
 
-#### Linearized Dynamics equation of the car:
+<!-- #### Linearized Dynamics equation of the car:
 
 $$ \dot \Epsilon = A\Epsilon + BU $$
 
@@ -94,7 +94,7 @@ where, $\Epsilon$ is the state variable and $U$ is the control variable.
 
 $$\Epsilon = \begin{bmatrix} x,y,\phi,\dot x,\dot y, \dot \phi \end{bmatrix}$$
 
-$$U = \begin{bmatrix} V, \delta \end{bmatrix}$$
+$$U = \begin{bmatrix} V, \delta \end{bmatrix}$$ -->
 
 #### MPC Formulation:
 
@@ -115,7 +115,7 @@ $$f = \begin{bmatrix} 2E^TQ\Theta & 0\end{bmatrix}$$
 $$\epsilon = \text{Slack variable} $$
 
 $$Y = \Phi_{X(t|t)} + \Theta \Delta U(t)$$
-
+<!-- 
 #### Stacking the states and inputs:
 
 $$\eeta = \begin{bmatrix} x,y,\phi,\dot x,\dot y, \dot \phi \end{bmatrix}$$
@@ -124,7 +124,7 @@ $$U = \begin{bmatrix} V, \delta \end{bmatrix}$$
 
 $$\Delta U = \begin{bmatrix} \Delta V, \Delta \delta \end{bmatrix}$$
 
-$$\X = \begin{bmatrix} \Epsilon, U \end{bmatrix} $$
+$$\X = \begin{bmatrix} \Epsilon, U \end{bmatrix} $$ -->
 
 ### Setup:
 This is the setup for ubuntu(22.04). Not sure how it works on Windows/Mac.
