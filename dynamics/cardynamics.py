@@ -50,8 +50,8 @@ class dynamics(struct.PyTreeNode):
         return psiddot
     
     def A(self, x, u):
-        xr = self.stater
-        ur = self.inputr
+        xr = x
+        ur = u
         a1 = grad(self.f1, 0)(xr, ur)
         a2 = grad(self.f2, 0)(xr, ur)
         a3 = grad(self.f3, 0)(xr, ur)
@@ -62,8 +62,8 @@ class dynamics(struct.PyTreeNode):
         return A
     
     def B(self, x, u):
-        xr = self.stater
-        ur = self.inputr
+        xr = x
+        ur = u
         b1 = grad(self.f1, 1)(xr, ur)
         b2 = grad(self.f2, 1)(xr, ur)
         b3 = grad(self.f3, 1)(xr, ur)
@@ -74,9 +74,9 @@ class dynamics(struct.PyTreeNode):
         B = self.T*np.stack((b1,b2,b3,b4,b5,b6), axis=0)
         return B
     
-    def pri(self):
-        xr = self.stater
-        ur = self.inputr
+    def pri(self,x,u):
+        xr = x
+        ur = u
         A_p1 = np.column_stack((self.A(xr, ur), self.B(xr, ur)))
         A_p2 = np.column_stack((jnp.zeros((2,6)), jnp.identity(2)))
         A_p = np.row_stack((A_p1, A_p2))
@@ -94,19 +94,19 @@ class dynamics(struct.PyTreeNode):
         C = jnp.concatenate((C,jnp.zeros((3,5))),axis=1)
         return C
     
-    def phi(self):
+    def phi(self,x,u):
         phi = jnp.zeros((3,8))
-        A_p, B_p = self.pri()
-        C_p = self.C(self.stater, self.inputr)
+        A_p, B_p = self.pri(x,u)
+        C_p = self.C(x, u)
         phi = C_p.dot(A_p)
         for i in range(self.Np-1):
             phi = np.append(phi,C_p.dot(jnp.power(A_p,(i+2))),axis=0)
         return phi
     
-    def theta(self):
+    def theta(self,x,u):
         the = jnp.zeros((8,2))
-        A_p, B_p = self.pri()
-        C_p = self.C(self.stater, self.inputr)
+        A_p, B_p = self.pri(x,u)
+        C_p = self.C(x, u)
         row = np.zeros((3,self.Nc*2))
         for i in range(self.Nc):
             for j in range(self.Nc):
@@ -122,10 +122,10 @@ class dynamics(struct.PyTreeNode):
         return the
     
     def Y(self,x,u):
-        stated = self.state - self.stater
-        inputd = self.input - self.inputr
-        Y1 = self.phi().dot(jnp.concatenate((stated,inputd),axis=0)).reshape((3*self.Np,1)) 
-        Y2 = self.theta().dot(self.delu)
+        stated = self.state - x
+        inputd = self.input - u
+        Y1 = self.phi(x,u).dot(jnp.concatenate((stated,inputd),axis=0)).reshape((3*self.Np,1)) 
+        Y2 = self.theta(x,u).dot(self.delu)
         Y2 = np.append(Y2,jnp.zeros(((Y1.shape[0] - Y2.shape[0]),1)),axis=0)
         Y = Y1 + Y2
         return Y
