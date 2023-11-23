@@ -118,7 +118,7 @@ $$Y = \Phi_{X(t|t)} + \Theta \Delta U(t)$$
 
 #### Stacking the states and inputs:
 
-$$\Epsilon = \begin{bmatrix} x,y,\phi,\dot x,\dot y, \dot \phi \end{bmatrix}$$
+$$\eeta = \begin{bmatrix} x,y,\phi,\dot x,\dot y, \dot \phi \end{bmatrix}$$
 
 $$U = \begin{bmatrix} V, \delta \end{bmatrix}$$
 
