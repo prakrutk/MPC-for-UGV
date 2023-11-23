@@ -91,7 +91,9 @@ $$ \dot \psi = \frac{\dot y}{l_r} $$
 $$ \dot X = AX + BU $$
 
 where, $X$ is the state variable and $U$ is the control variable.
+
 $$X = \begin{bmatrix} x,y,\phi,\dot x,\dot y, \dot \phi \end{bmatrix}$$
+
 $$U = \begin{bmatrix} V, \delta \end{bmatrix}$$
 
 #### MPC Formulation:
