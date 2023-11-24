@@ -136,7 +136,7 @@ class pybullet_dynamics:
     p.changeConstraint(c, gearRatio=-1, gearAuxLink=15, maxForce=10000)
     return car, wheels, distance
 
-  def loop(velo, force, delta, wheels, car, distance):
+  def loop(velo, force, delta, wheels, car, distance,i):
     steering = [0, 2]
     img_w, img_h = 120, 80
     maxForce = force
@@ -156,35 +156,36 @@ class pybullet_dynamics:
       p.setJointMotorControl2(car, steer, p.POSITION_CONTROL, targetPosition=-steeringAngle)
       agent_pos, agent_orn =p.getBasePositionAndOrientation(car)
 
-      yaw = p.getEulerFromQuaternion(agent_orn)[-1]
-      xA, yA, zA = agent_pos
-      zA = zA + 0.3 # make the camera a little higher than the robot
+    yaw = p.getEulerFromQuaternion(agent_orn)[-1]
+    xA, yA, zA = agent_pos
+    zA = zA + 0.3 # make the camera a little higher than the robot
 
-      # compute focusing point of the camera
-      xB = xA + math.cos(yaw) * distance
-      yB = yA + math.sin(yaw) * distance
-      zB = zA
+    # compute focusing point of the camera
+    xB = xA + math.cos(yaw) * distance
+    yB = yA + math.sin(yaw) * distance
+    zB = zA
 
-      view_matrix = p.computeViewMatrix(
-                          cameraEyePosition=[xA, yA, zA],
-                          cameraTargetPosition=[xB, yB, zB],
-                          cameraUpVector=[0, 0, 1.0]
-                      )
+    view_matrix = p.computeViewMatrix(
+                        cameraEyePosition=[xA, yA, zA],
+                        cameraTargetPosition=[xB, yB, zB],
+                        cameraUpVector=[0, 0, 1.0]
+                    )
 
-      projection_matrix = p.computeProjectionMatrixFOV(
-                              fov=90, aspect=1.5, nearVal=0.02, farVal=3.5)
+    projection_matrix = p.computeProjectionMatrixFOV(
+                            fov=90, aspect=1.5, nearVal=0.02, farVal=3.5)
 
-      imgs = p.getCameraImage(img_w, img_h,
-                              view_matrix,
-                              projection_matrix, shadow=True,
-                              renderer=p.ER_BULLET_HARDWARE_OPENGL)
-      frame = cv2.resize(imgs[2], (640, 480))
-        
-      midpoint = PerspectiveTransform()
-      midx, midy = midpoint.midpoint(frame)
+    imgs = p.getCameraImage(img_w, img_h,
+                            view_matrix,
+                            projection_matrix, shadow=True,
+                            renderer=p.ER_BULLET_HARDWARE_OPENGL)
+    frame = cv2.resize(imgs[2], (640, 480))
+      
+    midpoint = PerspectiveTransform()
+    midx, midy = midpoint.midpoint(frame,i)
 
     steering
     if (useRealTimeSim == 0):
       p.stepSimulation()
     time.sleep(0.01)
-    return p.getBasePositionAndOrientation(car)
+    pos, orn = p.getBasePositionAndOrientation(car)
+    return pos,orn,midx,midy
