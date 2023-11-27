@@ -45,20 +45,20 @@ Ynext = coeff.Y(x_i,u_i)
 
 # Make a circle as a refernce trajectory
 def reff(i,x_i,midx,midy):
-    x = i*(midx - x_i[0])/Np
-    y = i*(midy - x_i[1])/Np
+    x = x_i[0] + (i+1)*(midx - x_i[0])/Np
+    y = x_i[0] + (i+1)*(midy - x_i[1])/Np
     theta = jnp.arctan2(y,x)
     xdot = 0
     ydot = 0
     thetadot = 0.0
     return x,y,theta
 
-def stateref(t,xr):
-    x = 3*jnp.cos(2*3.14*t)
-    y = 3*jnp.sin(2*3.14*t)
+def stateref(xr,x_i,midx,midy):
+    x = x_i[0] + (midx - x_i[0])/Np
+    y = x_i[0] + (midy - x_i[1])/Np
     theta = jnp.arctan2(y,x)
-    xdot = -3*jnp.sin(2*3.14*t)
-    ydot = 3*jnp.cos(2*3.14*t)
+    xdot = 0
+    ydot = 0
     thetadot = 0.0
     xr = xr.at[0].set(x)
     xr = xr.at[1].set(y)
@@ -69,13 +69,14 @@ def stateref(t,xr):
     return xr
 
 def linearmpc(x_i,u_i,t,xr,midx,midy):
-    xr = stateref(t,xr)
+    xr = stateref(xr,x_i,midx,midy)
     u = cvx.Variable((2*Nc +1,1))
     # u_t=u_t.reshape(2,1)
     cost = 0.0
     constraints = []
     for i in range(Np):
         Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = jnp.array(reff(i,x_i,x_i[0]+midx,x_i[1]+midy))
+    print('Yreff=',Yreff)
     the_c=jnp.concatenate((coeff.theta(xr,ur),jnp.zeros((3*(Np-Nc),2*Nc))),axis=0)
     H = jnp.transpose(the_c).dot(Q).dot(the_c) + R 
     H = jnp.append(H,jnp.zeros((1,H.shape[1])),axis=0)
@@ -93,7 +94,7 @@ def linearmpc(x_i,u_i,t,xr,midx,midy):
         constraints += [u_i[0] + u[2*k,:] <= 100]
         constraints += [u_i[1] + u[2*k+1,:] <= 1.5]
         constraints += [u_i[1] + u[2*k+1,:] >= -1.5]
-        constraints += [u_i[0] + u[2*k,:] >= 10.5]
+        constraints += [u_i[0] + u[2*k,:] >= 0]
     constraints += [Ymin - u[2*Nc,:] <= coeff.Y(xr,ur)]
     constraints += [coeff.Y(xr,ur) <= Ymax + u[2*Nc,:]]
     
@@ -107,7 +108,7 @@ def check_goal(state, goal):
     else:
         return False
 
-def simulate(initial_state,goal,xr,cars,wheels,distance):
+def simulate(initial_state,goal,cars,wheels,distance):
     goal = goal 
     state = initial_state
     time = 0.0
@@ -130,9 +131,9 @@ def simulate(initial_state,goal,xr,cars,wheels,distance):
 
 def main():
     cars,wheels,distance = pybullet_dynamics.sim()
-    initial_state = jnp.array([0,0,0,0,0,0])
-    goal = jnp.array([0.32,15,0,0,0,0])
-    simulate(initial_state,goal,xr,cars,wheels,distance)
+    initial_state = jnp.array([3,0,0,0,0,0])
+    goal = jnp.array([-3,0,0,0,0,0])
+    simulate(initial_state,goal,cars,wheels,distance)
 
 if __name__ == '__main__':
     main()
