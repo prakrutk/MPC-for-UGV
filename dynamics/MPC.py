@@ -68,7 +68,7 @@ def stateref(xr,x_i,midx,midy):
     xr = xr.at[5].set(thetadot)
     return xr
 
-def linearmpc(x_i,u_i,t,midx,midy):
+def linearmpc(x_i,u_i,xr,t,midx,midy):
     xr = stateref(xr,x_i,midx,midy)
     u = cvx.Variable((2*Nc +1,1))
     # u_t=u_t.reshape(2,1)
@@ -121,7 +121,7 @@ def simulate(initial_state,goal,cars,wheels,distance):
     u_t = jnp.array([0.0,0.0])
     x,phi,midxn,midyn = pybullet_dynamics.loop(0,200000,0,wheels,cars,distance)
     while MAX_TIME >= time:
-        u, u_old = linearmpc(state,u_t,time,midxn,midyn)
+        u, u_old = linearmpc(state,u_t,xr,time,midxn,midyn)
         for i in range(Nc):
             # x,phi = pyconnect(2*u[2*i,0],u[2*i+1,0],wheels,car,useRealTimeSim)
             x,phi,midx,midy = pybullet_dynamics.loop(u_old[0]+u[2*i,0],200000,u_old[1]+u[2*i+1,0],wheels,cars,distance)

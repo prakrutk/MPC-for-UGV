@@ -3,7 +3,9 @@ import time
 import pybullet_data
 import math
 import cv2
+# import gym
 from Waypoint_generation.Waypoint_new import PerspectiveTransform
+# from gymduckietown.gym_duckietown.envs import DuckietownEnv
 
 class pybullet_dynamics:
 
@@ -22,6 +24,7 @@ class pybullet_dynamics:
     #for video recording (works best on Mac and Linux, not well on Windows)
     #p.startStateLogging(p.STATE_LOGGING_VIDEO_MP4, "racecar.mp4")
     p.setRealTimeSimulation(useRealTimeSim)  # either this
+    # env = gym.make("Duckietown-udem1-v0")
     p.loadSDF("stadium.sdf")
     # p.loadURDF("plane.urdf")
     # Wall1Id = p.createCollisionShape(p.GEOM_BOX,
