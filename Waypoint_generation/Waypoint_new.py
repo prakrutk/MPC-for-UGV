@@ -101,7 +101,7 @@ class PerspectiveTransform():
 
         # cv2.imshow("Original", frame)
         input.write(frame)
-        cv2.imshow("Bird's Eye View", transformed_frame)
+        # cv2.imshow("Bird's Eye View", transformed_frame)
         out.write(transformed_frame)
         # cv2.imshow("Lane Detection - Image Thresholding", mask)
 

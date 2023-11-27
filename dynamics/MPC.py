@@ -43,10 +43,10 @@ coeff = dynamics(state = x_i
 
 Ynext = coeff.Y(x_i,u_i)
 
-# Make a circle as a refernce trajectory
+# Make a refernce trajectory
 def reff(i,x_i,midx,midy):
     x = x_i[0] + (i+1)*(midx - x_i[0])/Np
-    y = x_i[0] + (i+1)*(midy - x_i[1])/Np
+    y = x_i[1] + (i+1)*(midy - x_i[1])/Np
     theta = jnp.arctan2(y,x)
     xdot = 0
     ydot = 0
@@ -55,7 +55,7 @@ def reff(i,x_i,midx,midy):
 
 def stateref(xr,x_i,midx,midy):
     x = x_i[0] + (midx - x_i[0])/Np
-    y = x_i[0] + (midy - x_i[1])/Np
+    y = x_i[1] + (midy - x_i[1])/Np
     theta = jnp.arctan2(y,x)
     xdot = 0
     ydot = 0
@@ -68,7 +68,7 @@ def stateref(xr,x_i,midx,midy):
     xr = xr.at[5].set(thetadot)
     return xr
 
-def linearmpc(x_i,u_i,t,xr,midx,midy):
+def linearmpc(x_i,u_i,t,midx,midy):
     xr = stateref(xr,x_i,midx,midy)
     u = cvx.Variable((2*Nc +1,1))
     # u_t=u_t.reshape(2,1)
@@ -102,6 +102,12 @@ def linearmpc(x_i,u_i,t,xr,midx,midy):
     prob.solve()
     return u.value,u_i
 
+def check_waypoint(state,midx,midy):
+    if abs(state[0] - midx) < 0.05 and abs(state[1] - midy) <0.05:
+        return True
+    else:
+        return False
+
 def check_goal(state, goal):
     if abs(state[0] - goal[0]) < 0.05 and abs(state[1] - goal[1]) < 0.05:
         return True
@@ -113,9 +119,9 @@ def simulate(initial_state,goal,cars,wheels,distance):
     state = initial_state
     time = 0.0
     u_t = jnp.array([0.0,0.0])
-    x,phi,midx,midy = pybullet_dynamics.loop(0,200000,0,wheels,cars,distance)
+    x,phi,midxn,midyn = pybullet_dynamics.loop(0,200000,0,wheels,cars,distance)
     while MAX_TIME >= time:
-        u, u_old = linearmpc(state,u_t,time,xr,midx,midy)
+        u, u_old = linearmpc(state,u_t,time,midxn,midyn)
         for i in range(Nc):
             # x,phi = pyconnect(2*u[2*i,0],u[2*i+1,0],wheels,car,useRealTimeSim)
             x,phi,midx,midy = pybullet_dynamics.loop(u_old[0]+u[2*i,0],200000,u_old[1]+u[2*i+1,0],wheels,cars,distance)
@@ -125,9 +131,10 @@ def simulate(initial_state,goal,cars,wheels,distance):
         u_t = jnp.array([u[2*Nc-2,0],u[2*Nc-1,0]])
 
         i +=1
-
+        if check_waypoint(state,midxn,midyn):
+            midxn,midyn = midx,midy
         if check_goal(state, goal):
-            goal = jnp.array([midx,midy,0.0,0.0,0.0,0.0])
+            break
 
 def main():
     cars,wheels,distance = pybullet_dynamics.sim()
