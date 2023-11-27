@@ -136,7 +136,7 @@ class pybullet_dynamics:
     p.changeConstraint(c, gearRatio=-1, gearAuxLink=15, maxForce=10000)
     return car, wheels, distance
 
-  def loop(velo, force, delta, wheels, car, distance,i):
+  def loop(velo, force, delta, wheels, car, distance):
     steering = [0, 2]
     img_w, img_h = 120, 80
     maxForce = force
@@ -181,7 +181,7 @@ class pybullet_dynamics:
     frame = cv2.resize(imgs[2], (640, 480))
       
     midpoint = PerspectiveTransform()
-    midx, midy = midpoint.midpoint(frame,i)
+    midx, midy = midpoint.midpoint(frame)
 
     steering
     if (useRealTimeSim == 0):

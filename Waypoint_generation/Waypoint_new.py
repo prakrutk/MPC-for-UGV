@@ -20,7 +20,7 @@ class PerspectiveTransform():
 
     # def nothing(x):
     #     pass
-    def midpoint(self,frame,i):
+    def midpoint(self,frame):
         # cv2.namedWindow("Trackbars")
 
         # cv2.createTrackbar("L - H", "Trackbars", 0, 255, self.nothing)
@@ -97,7 +97,7 @@ class PerspectiveTransform():
         conversion_factor = 0.001  # 1 pixel = 0.1 meters
         avg_midpoint = (avg_midpoint) * conversion_factor
         midy = (240) * conversion_factor
-        print(avg_midpoint, i + midy)  # Print the midpoint in centimeters
+        print(avg_midpoint, midy)  # Print the midpoint in centimeters
 
         # cv2.imshow("Original", frame)
         input.write(frame)
@@ -110,5 +110,5 @@ class PerspectiveTransform():
         input.release()
         out.release()
         cv2.destroyAllWindows()
-        return avg_midpoint, i + midy
+        return avg_midpoint, midy
 

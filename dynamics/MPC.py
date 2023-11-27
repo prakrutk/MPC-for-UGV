@@ -44,9 +44,9 @@ coeff = dynamics(state = x_i
 Ynext = coeff.Y(x_i,u_i)
 
 # Make a circle as a refernce trajectory
-def reff(Np,midx,midy):
-    x = midx
-    y = midy
+def reff(i,x_i,midx,midy):
+    x = i*(midx - x_i[0])/Np
+    y = i*(midy - x_i[1])/Np
     theta = jnp.arctan2(y,x)
     xdot = 0
     ydot = 0
@@ -75,7 +75,7 @@ def linearmpc(x_i,u_i,t,xr,midx,midy):
     cost = 0.0
     constraints = []
     for i in range(Np):
-        Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = jnp.array(reff(Np,midx,midy))
+        Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = jnp.array(reff(i,x_i,x_i[0]+midx,x_i[1]+midy))
     the_c=jnp.concatenate((coeff.theta(xr,ur),jnp.zeros((3*(Np-Nc),2*Nc))),axis=0)
     H = jnp.transpose(the_c).dot(Q).dot(the_c) + R 
     H = jnp.append(H,jnp.zeros((1,H.shape[1])),axis=0)
@@ -111,15 +111,14 @@ def simulate(initial_state,goal,xr,cars,wheels,distance):
     goal = goal 
     state = initial_state
     time = 0.0
-    j = 0
     u_t = jnp.array([0.0,0.0])
+    x,phi,midx,midy = pybullet_dynamics.loop(0,200000,0,wheels,cars,distance)
     while MAX_TIME >= time:
-        u, u_old = linearmpc(state,u_t,time,xr)
+        u, u_old = linearmpc(state,u_t,time,xr,midx,midy)
         for i in range(Nc):
             # x,phi = pyconnect(2*u[2*i,0],u[2*i+1,0],wheels,car,useRealTimeSim)
-            x,phi,midx,midy = pybullet_dynamics.loop(u_old[0]+u[2*i,0],200000,u_old[1]+u[2*i+1,0],wheels,cars,distance,j)
+            x,phi,midx,midy = pybullet_dynamics.loop(u_old[0]+u[2*i,0],200000,u_old[1]+u[2*i+1,0],wheels,cars,distance)
             time += 0.01
-            j += 0.1
         state = jnp.array([x[0],x[1],phi[2],0.0,0.0,0.0])
         x_t = state
         u_t = jnp.array([u[2*Nc-2,0],u[2*Nc-1,0]])
