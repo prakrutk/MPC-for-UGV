@@ -76,7 +76,7 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
     constraints = []
     for i in range(Np):
         Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = jnp.array(reff(i,x_i,x_i[0]+midx,x_i[1]+midy))
-    print('Yreff=',Yreff)
+    # print('Yreff=',Yreff)
     the_c=jnp.concatenate((coeff.theta(xr,ur),jnp.zeros((3*(Np-Nc),2*Nc))),axis=0)
     H = jnp.transpose(the_c).dot(Q).dot(the_c) + R 
     H = jnp.append(H,jnp.zeros((1,H.shape[1])),axis=0)
@@ -91,10 +91,10 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
         constraints += [u[2*k,:] >= -10.5]
         constraints += [u[2*k+1,:] <= 0.1]
         constraints += [u[2*k+1,:] >= -0.1]
-        constraints += [u_i[0] + u[2*k,:] <= 100]
-        constraints += [u_i[1] + u[2*k+1,:] <= 1.5]
-        constraints += [u_i[1] + u[2*k+1,:] >= -1.5]
-        constraints += [u_i[0] + u[2*k,:] >= 0]
+        constraints += [u_i[0] + u[2*k,:] <= 20]
+        constraints += [u_i[1] + u[2*k+1,:] <= 1.0]
+        constraints += [u_i[1] + u[2*k+1,:] >= -1.0]
+        constraints += [u_i[0] + u[2*k,:] >= 10]
     constraints += [Ymin - u[2*Nc,:] <= coeff.Y(xr,ur)]
     constraints += [coeff.Y(xr,ur) <= Ymax + u[2*Nc,:]]
     
@@ -138,7 +138,7 @@ def simulate(initial_state,goal,cars,wheels,distance):
 
 def main():
     cars,wheels,distance = pybullet_dynamics.sim()
-    initial_state = jnp.array([3,0,0,0,0,0])
+    initial_state = jnp.array([0,0,0,0,0,0])
     goal = jnp.array([-3,0,0,0,0,0])
     simulate(initial_state,goal,cars,wheels,distance)
 

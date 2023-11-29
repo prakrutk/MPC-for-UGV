@@ -61,8 +61,8 @@ class PerspectiveTransform():
         # u_s = cv2.getTrackbarPos("U - S", "Trackbars")
         # u_v = cv2.getTrackbarPos("U - V", "Trackbars")
 
-        lower = np.array([110, 110, 110])
-        upper = np.array([225, 225, 225])
+        lower = np.array([50, 50, 50])
+        upper = np.array([200, 200, 200])
         mask = cv2.inRange(hsv_transformed_frame, lower, upper)
 
         ### Hough Transform for Lane Detection
@@ -97,18 +97,18 @@ class PerspectiveTransform():
         conversion_factor = 0.001  # 1 pixel = 0.1 meters
         avg_midpoint = (avg_midpoint) * conversion_factor
         midy = (240) * conversion_factor
-        print(avg_midpoint, midy)  # Print the midpoint in centimeters
+        # print(avg_midpoint, midy)  # Print the midpoint in centimeters
 
         # cv2.imshow("Original", frame)
         input.write(frame)
         # cv2.imshow("Bird's Eye View", transformed_frame)
         out.write(transformed_frame)
-        # cv2.imshow("Lane Detection - Image Thresholding", mask)
-
+        cv2.imshow("Lane Detection - Image Thresholding", mask)
+        cv2.waitKey(1000)
         # success, image = vidcap.read()  # Read the next frame
 
         input.release()
         out.release()
         cv2.destroyAllWindows()
-        return avg_midpoint, midy
+        return (avg_midpoint-0.32), midy
 
