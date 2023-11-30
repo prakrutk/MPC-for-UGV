@@ -1,4 +1,3 @@
-import jax.numpy as jnp
 import numpy as np
 from dynamics.cardynamics import dynamics
 import cvxpy as cvx
@@ -7,16 +6,16 @@ import matplotlib as plt
 
 Nc = 5
 Np = 10
-initial_state = jnp.array([0,0,0,0,0,0,0,0])
-x_i = jnp.array([3.0,0.0,0.0,0.0,0.0,0.0])
-u_i = jnp.array([0.0,0.0])
-xr = jnp.array([0.0,0.0,0.0,0.0,0.0,0.0])
-ur = jnp.array([0.0,0.0])
-delu = 0.1*jnp.ones((2*Nc,1))
+initial_state = np.array([0,0,0,0,0,0,0,0])
+x_i = np.array([3.0,0.0,0.0,0.0,0.0,0.0])
+u_i = np.array([0.0,0.0])
+xr = np.array([0.0,0.0,0.0,0.0,0.0,0.0])
+ur = np.array([0.0,0.0])
+delu = 0.1*np.ones((2*Nc,1))
 Yreff = np.ones((3*Np,1))
-Q = 100*jnp.identity(3*Np)
-R = 10*jnp.identity(2*Nc)
-tolerance = 0.01*jnp.ones((3*Np,1))
+Q = 100*np.identity(3*Np)
+R = 10*np.identity(2*Nc)
+tolerance = 0.01*np.ones((3*Np,1))
 Ymax = Yreff + tolerance
 Ymin = Yreff - tolerance
 rho = 1
@@ -47,7 +46,7 @@ Ynext = coeff.Y(x_i,u_i)
 def reff(i,x_i,midx,midy):
     x = x_i[0] + (i+1)*(midx - x_i[0])/Np
     y = x_i[1] + (i+1)*(midy - x_i[1])/Np
-    theta = jnp.arctan2(y,x)
+    theta = np.arctan2(y,x)
     xdot = 0
     ydot = 0
     thetadot = 0.0
@@ -56,16 +55,16 @@ def reff(i,x_i,midx,midy):
 def stateref(xr,x_i,midx,midy):
     x = x_i[0] + (midx - x_i[0])/Np
     y = x_i[1] + (midy - x_i[1])/Np
-    theta = jnp.arctan2(y,x)
+    theta = np.arctan2(y,x)
     xdot = 0
     ydot = 0
     thetadot = 0.0
-    xr = xr.at[0].set(x)
-    xr = xr.at[1].set(y)
-    xr = xr.at[2].set(theta)
-    xr = xr.at[3].set(xdot)
-    xr = xr.at[4].set(ydot)
-    xr = xr.at[5].set(thetadot)
+    xr[0] = x
+    xr[1] = y
+    xr[2] = theta
+    xr[3] = xdot
+    xr[4] = ydot
+    xr[5] = thetadot
     return xr
 
 def linearmpc(x_i,u_i,xr,t,midx,midy):
@@ -75,17 +74,17 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
     cost = 0.0
     constraints = []
     for i in range(Np):
-        Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = jnp.array(reff(i,x_i,x_i[0]+midx,x_i[1]+midy))
+        Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(reff(i,x_i,x_i[0]+midx,x_i[1]+midy))
     # print('Yreff=',Yreff)
-    the_c=jnp.concatenate((coeff.theta(xr,ur),jnp.zeros((3*(Np-Nc),2*Nc))),axis=0)
-    H = jnp.transpose(the_c).dot(Q).dot(the_c) + R 
-    H = jnp.append(H,jnp.zeros((1,H.shape[1])),axis=0)
-    c = jnp.zeros((H.shape[0],1))
-    c = c.at[-1].set(rho)
-    H = jnp.append(H,c,axis=1)
-    E = coeff.phi(xr,ur).dot(jnp.concatenate((x_i-xr,u_i-ur),axis=0)).reshape(3*Np,1) - Yreff
+    the_c=np.concatenate((coeff.theta(xr,ur),np.zeros((3*(Np-Nc),2*Nc))),axis=0)
+    H = np.transpose(the_c).dot(Q).dot(the_c) + R 
+    H = np.append(H,np.zeros((1,H.shape[1])),axis=0)
+    c = np.zeros((H.shape[0],1))
+    c[-1,0] = rho
+    H = np.append(H,c,axis=1)
+    E = coeff.phi(xr,ur).dot(np.concatenate((x_i-xr,u_i-ur),axis=0)).reshape(3*Np,1) - Yreff
     # print('E=',E)
-    cost += cvx.quad_form(u,H) + 2*jnp.transpose(E).dot(Q).dot(the_c)@u[0:2*Nc,:]
+    cost += cvx.quad_form(u,H) + 2*np.transpose(E).dot(Q).dot(the_c)@u[0:2*Nc,:]
     for k in range(Nc):
         constraints += [u[2*k,:] <= 10.5]
         constraints += [u[2*k,:] >= -10.5]
@@ -94,7 +93,7 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
         constraints += [u_i[0] + u[2*k,:] <= 20]
         constraints += [u_i[1] + u[2*k+1,:] <= 1.0]
         constraints += [u_i[1] + u[2*k+1,:] >= -1.0]
-        constraints += [u_i[0] + u[2*k,:] >= 10]
+        constraints += [u_i[0] + u[2*k,:] >= 10.5]
     constraints += [Ymin - u[2*Nc,:] <= coeff.Y(xr,ur)]
     constraints += [coeff.Y(xr,ur) <= Ymax + u[2*Nc,:]]
     
@@ -118,7 +117,7 @@ def simulate(initial_state,goal,cars,wheels,distance):
     goal = goal 
     state = initial_state
     time = 0.0
-    u_t = jnp.array([0.0,0.0])
+    u_t = np.array([0.0,0.0])
     x,phi,midxn,midyn = pybullet_dynamics.loop(0,200000,0,wheels,cars,distance)
     while MAX_TIME >= time:
         u, u_old = linearmpc(state,u_t,xr,time,midxn,midyn)
@@ -126,9 +125,9 @@ def simulate(initial_state,goal,cars,wheels,distance):
             # x,phi = pyconnect(2*u[2*i,0],u[2*i+1,0],wheels,car,useRealTimeSim)
             x,phi,midx,midy = pybullet_dynamics.loop(u_old[0]+u[2*i,0],200000,u_old[1]+u[2*i+1,0],wheels,cars,distance)
             time += 0.01
-        state = jnp.array([x[0],x[1],phi[2],0.0,0.0,0.0])
+        state = np.array([x[0],x[1],phi[2],0.0,0.0,0.0])
         x_t = state
-        u_t = jnp.array([u[2*Nc-2,0],u[2*Nc-1,0]])
+        u_t = np.array([u[2*Nc-2,0],u[2*Nc-1,0]])
 
         i +=1
         if check_waypoint(state,midxn,midyn):
@@ -138,8 +137,8 @@ def simulate(initial_state,goal,cars,wheels,distance):
 
 def main():
     cars,wheels,distance = pybullet_dynamics.sim()
-    initial_state = jnp.array([0,0,0,0,0,0])
-    goal = jnp.array([-3,0,0,0,0,0])
+    initial_state = np.array([0,0,0,0,0,0])
+    goal = np.array([-3,0,0,0,0,0])
     simulate(initial_state,goal,cars,wheels,distance)
 
 if __name__ == '__main__':

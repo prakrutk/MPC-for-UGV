@@ -183,8 +183,8 @@ class pybullet_dynamics:
                             renderer=p.ER_BULLET_HARDWARE_OPENGL)
 
     frame = cv2.resize(imgs[2], (640, 480))
-    cv2.imshow('frame', frame)
-    cv2.waitKey(1000000)
+    # cv2.imshow('frame', frame)
+    # cv2.waitKey(1000000)
       
     midpoint = PerspectiveTransform()
     midx, midy = midpoint.midpoint(frame)
