@@ -4,22 +4,22 @@ import cvxpy as cvx
 from Pybullet.racecar_differential import pybullet_dynamics
 import matplotlib as plt
 
-Nc = 5
-Np = 10
-initial_state = np.array([0,0,0,0,0,0,0,0])
-x_i = np.array([3.0,0.0,0.0,0.0,0.0,0.0])
-u_i = np.array([0.0,0.0])
-xr = np.array([0.0,0.0,0.0,0.0,0.0,0.0])
-ur = np.array([0.0,0.0])
-delu = 0.1*np.ones((2*Nc,1))
-Yreff = np.ones((3*Np,1))
-Q = 100*np.identity(3*Np)
-R = 10*np.identity(2*Nc)
-tolerance = 0.01*np.ones((3*Np,1))
-Ymax = Yreff + tolerance
-Ymin = Yreff - tolerance
-rho = 1
-epi = 0
+Nc = 5 # Control Horizon
+Np = 10 # Prediction Horizon
+initial_state = np.array([0,0,0,0,0,0,0,0]) # Initial state
+x_i = np.array([3.0,0.0,0.0,0.0,0.0,0.0]) # x,y,theta,xdot,ydot,thetadot
+u_i = np.array([0.0,0.0]) # v,omega
+xr = np.array([0.0,0.0,0.0,0.0,0.0,0.0]) # Reference state
+ur = np.array([0.0,0.0]) # Reference input
+delu = 0.1*np.ones((2*Nc,1)) # Input rate of change
+Yreff = np.ones((3*Np,1)) # Reference output
+Q = 100*np.identity(3*Np) # Weight matrix output 
+R = 10*np.identity(2*Nc) # Weight matrix input
+tolerance = 0.01*np.ones((3*Np,1)) # Tolerance
+Ymax = Yreff + tolerance # Maximum output
+Ymin = Yreff - tolerance # Minimum output
+rho = 1 # Slack variable weight
+epi = 0 # Slack variable
 MAX_TIME = 100 # seconds
 
 coeff = dynamics(state = x_i
@@ -38,11 +38,11 @@ coeff = dynamics(state = x_i
                 ,iz = 1
                 ,T = 0.1
                 ,Nc = Nc
-                ,Np = Np)
+                ,Np = Np) 
 
-Ynext = coeff.Y(x_i,u_i)
+# Ynext = coeff.Y(x_i,u_i)
 
-# Make a refernce trajectory
+# Make a refernce state
 def reff(i,x_i,midx,midy):
     x = x_i[0] + (i+1)*(midx - x_i[0])/Np
     y = x_i[1] + (i+1)*(midy - x_i[1])/Np
@@ -52,6 +52,7 @@ def reff(i,x_i,midx,midy):
     thetadot = 0.0
     return x,y,theta
 
+# Make a reference trajectory
 def stateref(xr,x_i,midx,midy):
     x = x_i[0] + (midx - x_i[0])/Np
     y = x_i[1] + (midy - x_i[1])/Np
@@ -67,6 +68,7 @@ def stateref(xr,x_i,midx,midy):
     xr[5] = thetadot
     return xr
 
+# Solve the optimization problem
 def linearmpc(x_i,u_i,xr,t,midx,midy):
     xr = stateref(xr,x_i,midx,midy)
     u = cvx.Variable((2*Nc +1,1))
@@ -82,13 +84,13 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
     c = np.zeros((H.shape[0],1))
     c[-1,0] = rho
     H = np.append(H,c,axis=1)
-    E = coeff.phi(xr,ur).dot(np.concatenate((x_i-xr,u_i-ur),axis=0)).reshape(3*Np,1) - Yreff
+    E = coeff.phi(xr,ur).dot(np.concatenate((x_i-xr,u_i-ur),axis=0)).reshape(3*Np,1) - Yreff # Error term
     # print('E=',E)
-    cost += cvx.quad_form(u,H) + 2*np.transpose(E).dot(Q).dot(the_c)@u[0:2*Nc,:]
+    cost += cvx.quad_form(u,H) + 2*np.transpose(E).dot(Q).dot(the_c)@u[0:2*Nc,:] # Cost function
     for k in range(Nc):
-        constraints += [u[2*k,:] <= 10.5]
-        constraints += [u[2*k,:] >= -10.5]
-        constraints += [u[2*k+1,:] <= 0.1]
+        constraints += [u[2*k,:] <= 10.5] # Delu Input constraints
+        constraints += [u[2*k,:] >= -10.5] # Delu Input constraints
+        constraints += [u[2*k+1,:] <= 0.1] 
         constraints += [u[2*k+1,:] >= -0.1]
         constraints += [u_i[0] + u[2*k,:] <= 20]
         constraints += [u_i[1] + u[2*k+1,:] <= 1.0]
@@ -97,7 +99,7 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
     constraints += [Ymin - u[2*Nc,:] <= coeff.Y(xr,ur)]
     constraints += [coeff.Y(xr,ur) <= Ymax + u[2*Nc,:]]
     
-    prob = cvx.Problem(cvx.Minimize(cost), constraints)
+    prob = cvx.Problem(cvx.Minimize(cost), constraints) # Optimization problem initialization
     prob.solve()
     return u.value,u_i
 
