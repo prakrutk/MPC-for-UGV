@@ -44,7 +44,11 @@ To run Waypoint generation code: \
 
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/ROS-Gazebo/Cafe_Husky.jpeg)
 
+#### Integrated fail 1:
+![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/laneerror.gif)
+
 ### Waypoint Generation: 
+<!--
 ##### Actual Image: 
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Waypoint_generation/Test.png)
 
@@ -52,7 +56,16 @@ To run Waypoint generation code: \
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Waypoint_generation/canny.png)
 
 ##### Hough Line: 
-![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Waypoint_generation/result.png)
+![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Waypoint_generation/result.png) -->
+#### Canny-edge + Hough Transform
+##### Input with mask edges:
+![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/input.gif)
+
+##### Output bird-eye view with waypoint:
+![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/output.gif)
+
+#### Contour detection:
+![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Contourdetection.gif)
 
 ### Dynamics Model:
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Model.png)
