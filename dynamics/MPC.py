@@ -86,20 +86,23 @@ def nearest_index(x,y,x_i,y_i):
 
 # Solve the optimization problem
 def linearmpc(x_i,u_i,xr,t,midx,midy):
-    dist = 0.0
-    for i in range(Np):
-        distn = nearest_index(x_i[0],x_i[1],Yreff[3*i],Yreff[3*i+1])
-        if distn < dist:
-            dist = distn
-            index = i
-    xr = np.concatenate(Yreff[3*index:3*index+2],np.array([0.0,0.0,0.0]))
+    # dist = 0.0
+    # for i in range(Np):
+    #     distn = nearest_index(x_i[0],x_i[1],Yreff[3*i],Yreff[3*i+1])
+    #     if distn < dist:
+    #         dist = distn
+    #         index = i
+    # xr = np.concatenate(Yreff[3*index:3*index+2],np.array([0.0,0.0,0.0]))
+
+    xr = stateref(xr,x_i,midx,midy)
         
     u = cvx.Variable((2*Nc +1,1))
     # u_t=u_t.reshape(2,1)
     cost = 0.0
     constraints = []
     for i in range(Np):
-        Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(spline(i+1,x_i,x_i[0]+midx,x_i[1]+midy))
+        # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(spline(i+1,x_i,x_i[0]+midx,x_i[1]+midy))
+        Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(reff(i+1,x_i,x_i[0]+midx,x_i[1]+midy))
     # print('Yreff=',Yreff)
     the_c=np.concatenate((coeff.theta(xr,ur),np.zeros((3*(Np-Nc),2*Nc))),axis=0)
     H = np.transpose(the_c).dot(Q).dot(the_c) + R 
