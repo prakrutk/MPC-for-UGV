@@ -21,8 +21,8 @@ class pybullet_dynamics:
 
     distance = 100000
     
-    #for video recording (works best on Mac and Linux, not well on Windows)
-    #p.startStateLogging(p.STATE_LOGGING_VIDEO_MP4, "racecar.mp4")
+    # for video recording (works best on Mac and Linux, not well on Windows)
+    # p.startStateLogging(p.STATE_LOGGING_VIDEO_MP4, "racecar.mp4")
     p.setRealTimeSimulation(useRealTimeSim)  # either this
     # env = gym.make("Duckietown-udem1-v0")
     p.loadSDF("stadium.sdf")
@@ -58,7 +58,7 @@ class pybullet_dynamics:
     wheels = [8, 15]
     print("----------------")
 
-    #p.setJointMotorControl2(car,10,p.VELOCITY_CONTROL,targetVelocity=1,force=10)
+    # p.setJointMotorControl2(car,10,p.VELOCITY_CONTROL,targetVelocity=1,force=10)
     c = p.createConstraint(car,
                           9,
                           car,
