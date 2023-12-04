@@ -120,7 +120,7 @@ Also,
 
 $$ \dot x = V $$
 
-$$ \dot y = \dot x(\alpha_f + \delta) - l_f\dot \psi $$
+$$ \dot y = \dot x(l_f + \delta) - l_r\dot \psi $$
 
 $$ \dot \psi = \frac{\dot y}{l_r} $$
 

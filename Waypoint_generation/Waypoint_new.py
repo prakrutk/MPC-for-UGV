@@ -95,12 +95,12 @@ class PerspectiveTransform():
         midy = (240) * conversion_factor
         # print(avg_midpoint, midy)  # Print the midpoint in centimeters
 
-        cv2.imshow("Original", frame)
-        input.write(frame)
-        cv2.imshow("Bird's Eye View", transformed_frame)
-        out.write(transformed_frame)
-        cv2.imshow("Lane Detection - Image Thresholding", mask)
-        cv2.waitKey(1000)
+        # cv2.imshow("Original", frame)
+        # input.write(frame)
+        # cv2.imshow("Bird's Eye View", transformed_frame)
+        # out.write(transformed_frame)
+        # cv2.imshow("Lane Detection - Image Thresholding", mask)
+        # cv2.waitKey(1000)
         # success, image = vidcap.read()  # Read the next frame
 
         input.release()
