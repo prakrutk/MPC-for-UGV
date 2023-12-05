@@ -5,6 +5,7 @@ import math
 import cv2
 # import gym
 from Waypoint_generation.Waypoint_new import PerspectiveTransform
+from Waypoint_generation.segment import Segment
 # from gymduckietown.gym_duckietown.envs import DuckietownEnv
 
 class pybullet_dynamics:
@@ -186,8 +187,10 @@ class pybullet_dynamics:
     # cv2.imshow('frame', frame)
     # cv2.waitKey(1000000)
       
-    midpoint = PerspectiveTransform()
-    midx, midy = midpoint.midpoint(frame)
+    # midpoint = PerspectiveTransform()
+    # midx, midy = midpoint.midpoint(frame)
+    midpoint = Segment()
+    midx, midy = midpoint.read_video(frame)
 
     steering
     if (useRealTimeSim == 0):
