@@ -46,8 +46,8 @@ class pybullet_dynamics:
     # p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall3Id,basePosition=[3.5, 2, 0.5],baseOrientation=p.getQuaternionFromEuler([0,0,67.55]))
     orn = p.getQuaternionFromEuler([0, 0, 0])
     car = p.loadURDF("racecar/racecar_differential.urdf",[0,20,1],orn)  #, [0,0,2],useFixedBase=True)
-    for i in range(p.getNumJoints(car)):
-      print(p.getJointInfo(car, i))
+    # for i in range(p.getNumJoints(car)):
+    #   print(p.getJointInfo(car, i))
     for wheel in range(p.getNumJoints(car)):
       p.setJointMotorControl2(car, wheel, p.VELOCITY_CONTROL, targetVelocity=0, force=0)
       p.getJointInfo(car, wheel)
@@ -190,11 +190,13 @@ class pybullet_dynamics:
     # midpoint = PerspectiveTransform()
     # midx, midy = midpoint.midpoint(frame)
     midpoint = Segment()
-    midx, midy = midpoint.read_video(frame)
+    midpo = midpoint.read_video(frame)
+    if midpo is None:
+      midpo = [0,0]
 
     steering
     if (useRealTimeSim == 0):
       p.stepSimulation()
     time.sleep(0.01)
     pos, orn = p.getBasePositionAndOrientation(car)
-    return pos,orn,midx,midy
+    return pos,orn,midpo[0],midpo[1]
