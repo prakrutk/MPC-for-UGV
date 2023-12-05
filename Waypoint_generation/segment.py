@@ -35,7 +35,7 @@ class Segment():
         centroid = self.find_surface_centroid(frame)
         conversion_factor = 0.001
         if centroid:
-            centroid_x, centroid_y = centroid
+            midx = centroid[0] * conversion_factor
             midx = centroid_x * conversion_factor
             midy = centroid_y * conversion_factor
             return midx,midy
