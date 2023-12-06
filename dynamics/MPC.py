@@ -95,8 +95,8 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
     # xr = np.concatenate(Yreff[3*index:3*index+2],np.array([0.0,0.0,0.0]))
 
     xr = stateref(xr,x_i,midx,midy)
-    print('x_i[0] - midx = ',(x_i[0]-midx))
-    print('x_i[1] - midy = ',(x_i[1]-midy))
+    # print('x_i[0] - midx = ',(x_i[0]-midx))
+    # print('x_i[1] - midy = ',(x_i[1]-midy))
     u = cvx.Variable((2*Nc +1,1))
     # u_t=u_t.reshape(2,1)
     cost = 0.0
@@ -112,7 +112,7 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
     c[-1,0] = rho
     H = np.append(H,c,axis=1)
     E = coeff.phi(xr,ur).dot(np.concatenate((x_i-xr,u_i-ur),axis=0)).reshape(3*Np,1) - Yreff # Error term
-    # print('E=',E)
+    print('E=',E)
     cost += cvx.quad_form(u,H) + 2*np.transpose(E).dot(Q).dot(the_c)@u[0:2*Nc,:] # Cost function
     for k in range(Nc):
         constraints += [u[2*k,:] <= 5.5] # Delu Input constraints
