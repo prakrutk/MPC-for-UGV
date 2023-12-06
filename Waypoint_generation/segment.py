@@ -141,7 +141,7 @@ class Segment():
         # cv2.imshow('im',im)
         # cv2.waitKey(100000)
         centroid = self.find_surface_centroid(im)
-        print(centroid)
+        # print(centroid)
         conversion_factorx = 1./640.
         conversion_factory = 0.5/480.
         if centroid:

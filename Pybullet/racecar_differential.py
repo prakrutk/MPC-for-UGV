@@ -36,7 +36,7 @@ class pybullet_dynamics:
     #                                   halfExtents=[0.05,1.5,0.5])
     # Wall4Id = p.createCollisionShape(p.GEOM_BOX,
     #                                   halfExtents=[0.05,3.5,0.5])
-    p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[2, 20, 0.5])
+    # p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[2, 20, 0.5])
     # p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[0, 5, 0.5],baseOrientation=p.getQuaternionFromEuler([0,0,67.55]))
     # p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[0, -5, 0.5],baseOrientation=p.getQuaternionFromEuler([0,0,-67.55]))
     # p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[-5, 0, 0.5])

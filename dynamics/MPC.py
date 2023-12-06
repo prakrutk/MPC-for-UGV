@@ -11,7 +11,7 @@ x_i = np.array([0.0,0.0,0.0,0.0,0.0,0.0]) # x,y,theta,xdot,ydot,thetadot
 u_i = np.array([0.0,0.0]) # v,omega
 xr = np.array([0.0,0.0,0.0,0.0,0.0,0.0]) # Reference state
 ur = np.array([0.0,0.0]) # Reference input
-delu = 0.0*np.ones((2*Nc,1)) # Input rate of change
+delu = 0.1*np.ones((2*Nc,1)) # Input rate of change
 Yreff = np.ones((3*Np,1)) # Reference output
 Q = 100*np.identity(3*Np) # Weight matrix output 
 R = 10*np.identity(2*Nc) # Weight matrix input
@@ -22,6 +22,7 @@ rho = 1 # Slack variable weight
 epi = 0 # Slack variable
 MAX_TIME = 100 # seconds
 
+# Call the dynamics class
 coeff = dynamics(state = x_i
                 ,input = u_i
                 ,inputr = ur
@@ -86,7 +87,7 @@ def nearest_index(x,y,x_i,y_i):
 
 # Solve the optimization problem
 def linearmpc(x_i,u_i,xr,t,midx,midy):
-    # dist = 0.0
+    # dist = 100.0
     # for i in range(Np):
     #     distn = nearest_index(x_i[0],x_i[1],Yreff[3*i],Yreff[3*i+1])
     #     if distn < dist:
@@ -94,7 +95,7 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
     #         index = i
     # xr = np.concatenate(Yreff[3*index:3*index+2],np.array([0.0,0.0,0.0]))
 
-    xr = stateref(xr,x_i,midx,midy)
+    xr = stateref(xr,x_i,(x_i[0]+midx),(x_i[1]+midy))
     # print('x_i[0] - midx = ',(x_i[0]-midx))
     # print('x_i[1] - midy = ',(x_i[1]-midy))
     u = cvx.Variable((2*Nc +1,1))
@@ -112,7 +113,7 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
     c[-1,0] = rho
     H = np.append(H,c,axis=1)
     E = coeff.phi(xr,ur).dot(np.concatenate((x_i-xr,u_i-ur),axis=0)).reshape(3*Np,1) - Yreff # Error term
-    print('E=',E)
+    # print('E=',E)
     cost += cvx.quad_form(u,H) + 2*np.transpose(E).dot(Q).dot(the_c)@u[0:2*Nc,:] # Cost function
     for k in range(Nc):
         constraints += [u[2*k,:] <= 5.5] # Delu Input constraints
@@ -136,6 +137,7 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
 #     else:
 #         return False
 
+# Check goal location
 def check_goal(state, goal):
     if abs(state[0] - goal[0]) < 0.05 and abs(state[1] - goal[1]) < 0.05:
         return True
