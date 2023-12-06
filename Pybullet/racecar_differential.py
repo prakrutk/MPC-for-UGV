@@ -28,15 +28,15 @@ class pybullet_dynamics:
     # env = gym.make("Duckietown-udem1-v0")
     p.loadSDF("stadium.sdf")
     # p.loadURDF("plane.urdf")
-    # Wall1Id = p.createCollisionShape(p.GEOM_BOX,
-    #                                   halfExtents=[0.05,5,0.5])
+    Wall1Id = p.createCollisionShape(p.GEOM_BOX,
+                                      halfExtents=[0.5,0.5,0.5])
     # Wall2Id = p.createCollisionShape(p.GEOM_BOX,
     #                                   halfExtents=[0.05,2,0.5])
     # Wall3Id = p.createCollisionShape(p.GEOM_BOX,
     #                                   halfExtents=[0.05,1.5,0.5])
     # Wall4Id = p.createCollisionShape(p.GEOM_BOX,
     #                                   halfExtents=[0.05,3.5,0.5])
-    # p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[5, 0, 0.5])
+    p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[2, 20, 0.5])
     # p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[0, 5, 0.5],baseOrientation=p.getQuaternionFromEuler([0,0,67.55]))
     # p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[0, -5, 0.5],baseOrientation=p.getQuaternionFromEuler([0,0,-67.55]))
     # p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[-5, 0, 0.5])
@@ -48,6 +48,10 @@ class pybullet_dynamics:
     car = p.loadURDF("racecar/racecar_differential.urdf",[0,20,1],orn)  #, [0,0,2],useFixedBase=True)
     # for i in range(p.getNumJoints(car)):
     #   print(p.getJointInfo(car, i))
+    # mass = 0
+    # for i in range(p.getNumJoints(car)):
+    #   mass += p.getDynamicsInfo(car, i)[0]
+    # print(mass)
     for wheel in range(p.getNumJoints(car)):
       p.setJointMotorControl2(car, wheel, p.VELOCITY_CONTROL, targetVelocity=0, force=0)
       p.getJointInfo(car, wheel)
@@ -191,12 +195,12 @@ class pybullet_dynamics:
     # midx, midy = midpoint.midpoint(frame)
     midpoint = Segment()
     midpo = midpoint.read_video(frame)
+    # print(midpo)
     if midpo is None:
       midpo = [0,0]
 
     steering
     if (useRealTimeSim == 0):
       p.stepSimulation()
-    time.sleep(0.01)
     pos, orn = p.getBasePositionAndOrientation(car)
     return pos,orn,midpo[0],midpo[1]

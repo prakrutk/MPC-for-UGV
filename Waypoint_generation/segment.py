@@ -9,7 +9,6 @@ class Segment():
     def convert_color_to_black(self, image, target_color):
     # Set a tolerance for the color conversion (in case the exact RGB values are not found)
         tolerance = 50
-        print(target_color)
         # Define the lower and upper bounds for the target color
         lower_bound = np.array([max(value - tolerance, 0) for value in target_color])
         upper_bound = np.array([min(value + tolerance, 255) for value in target_color])
@@ -64,7 +63,7 @@ class Segment():
         # cv2.imshow('transformed_frame',transformed_frame)
         # cv2.waitKey(1000000)
         # Convert the frame to the HSV color space (Hue, Saturation, Value)
-        im_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        # im_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         # cv2.imshow('im_gray',im_gray)
         # cv2.waitKey(1000000)
         # (thresh, im_bw) = cv2.threshold(im_gray, 100, 0, cv2.THRESH_BINARY)
@@ -80,18 +79,18 @@ class Segment():
         # u_v = cv2.getTrackbarPos("U - V", "Trackbars")
 
         # Define the lower and upper bounds for the color of the surface you want to detect
-        lower_bound = np.array([190, 90, 45])
-        upper_bound = np.array([210, 110, 60])
+        # lower_bound = np.array([40, 90, 90])
+        # upper_bound = np.array([100, 150, 150])
 
-        # Create a mask based on the color bounds
-        mask = cv2.inRange(im_gray, lower_bound, upper_bound)
-        mask = cv2.bitwise_not(mask)
+        # # Create a mask based on the color bounds
+        # mask = cv2.inRange(frame, lower_bound, upper_bound)
+        # mask = cv2.bitwise_not(mask)
 
         # cv2.imshow('mask',mask)
         # cv2.waitKey(1000)
 
         # Find contours in the mask
-        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contours, _ = cv2.findContours(frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         if contours:
             # Find the largest contour (assumed to be the surface)
@@ -102,12 +101,13 @@ class Segment():
             if M["m00"] != 0:
                 cx = int(M["m10"] / M["m00"])
                 cy = int(M["m01"] / M["m00"])
+                cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
+                cv2.imshow('frame',frame)
+                cv2.waitKey(100)
                 return cx, cy
             
         # Plot the centroid in the frame
-        # cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
-        # cv2.imshow('frame',frame)
-        # cv2.waitKey(10000)
+
 
         return None
     
@@ -133,14 +133,20 @@ class Segment():
         imb = self.convert_color_to_black(transformed_frame, target_color)
         target_color = [0,91,136]
         imw = self.convert_color_to_white(imb, target_color)
-        im = cv2.cvtColor(imw, cv2.COLOR_BGR2HSV)
+        im = cv2.cvtColor(imw, cv2.COLOR_BGR2GRAY)
+        # cv2.imshow('im',im)
+        # cv2.waitKey(100000)
+        ret, im = cv2.threshold(im, 127, 255, 0)
+        # im = cv2.cvtColor(imw, cv2.COLOR_BGR2HSV)
         # cv2.imshow('im',im)
         # cv2.waitKey(100000)
         centroid = self.find_surface_centroid(im)
-        conversion_factor = 0.001
+        print(centroid)
+        conversion_factorx = 1./640.
+        conversion_factory = 0.5/480.
         if centroid:
-            midx = centroid[0] * conversion_factor
-            midy = centroid[1] * conversion_factor
+            midx = (centroid[0]-320)  * conversion_factorx
+            midy = centroid[1] * conversion_factory
             midp = np.array([midx,midy])
             return midp
         else:

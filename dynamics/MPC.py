@@ -4,14 +4,14 @@ import cvxpy as cvx
 from Pybullet.racecar_differential import pybullet_dynamics
 import matplotlib as plt
 
-Nc = 2 # Control Horizon
+Nc = 5 # Control Horizon
 Np = 10 # Prediction Horizon
 initial_state = np.array([0,0,0,0,0,0,0,0]) # Initial state
-x_i = np.array([3.0,0.0,0.0,0.0,0.0,0.0]) # x,y,theta,xdot,ydot,thetadot
+x_i = np.array([0.0,0.0,0.0,0.0,0.0,0.0]) # x,y,theta,xdot,ydot,thetadot
 u_i = np.array([0.0,0.0]) # v,omega
 xr = np.array([0.0,0.0,0.0,0.0,0.0,0.0]) # Reference state
 ur = np.array([0.0,0.0]) # Reference input
-delu = 0.1*np.ones((2*Nc,1)) # Input rate of change
+delu = 0.0*np.ones((2*Nc,1)) # Input rate of change
 Yreff = np.ones((3*Np,1)) # Reference output
 Q = 100*np.identity(3*Np) # Weight matrix output 
 R = 10*np.identity(2*Nc) # Weight matrix input
@@ -27,16 +27,16 @@ coeff = dynamics(state = x_i
                 ,inputr = ur
                 ,stater = xr
                 ,delu = delu
-                ,cl = 1
-                ,sf = 1
-                ,cc = 1
-                ,sr = 1
-                ,m = 1
-                ,alphaf = 1
-                ,lf = 1
-                ,lr = 1
-                ,iz = 1
-                ,T = 0.1
+                ,cl = 0.7
+                ,sf = 0.1
+                ,cc = 8.2
+                ,sr = 0.1
+                ,m = 6.38
+                ,alphaf = (5./360.)*2*np.pi
+                ,lf = 0.1
+                ,lr = 0.1
+                ,iz = 0.058
+                ,T = 1./240.
                 ,Nc = Nc
                 ,Np = Np) 
 
@@ -95,7 +95,8 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
     # xr = np.concatenate(Yreff[3*index:3*index+2],np.array([0.0,0.0,0.0]))
 
     xr = stateref(xr,x_i,midx,midy)
-        
+    print('x_i[0] - midx = ',(x_i[0]-midx))
+    print('x_i[1] - midy = ',(x_i[1]-midy))
     u = cvx.Variable((2*Nc +1,1))
     # u_t=u_t.reshape(2,1)
     cost = 0.0
@@ -114,14 +115,14 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
     # print('E=',E)
     cost += cvx.quad_form(u,H) + 2*np.transpose(E).dot(Q).dot(the_c)@u[0:2*Nc,:] # Cost function
     for k in range(Nc):
-        constraints += [u[2*k,:] <= 10.5] # Delu Input constraints
-        constraints += [u[2*k,:] >= -10.5] # Delu Input constraints
-        constraints += [u[2*k+1,:] <= 0.1] 
-        constraints += [u[2*k+1,:] >= -0.1]
+        constraints += [u[2*k,:] <= 5.5] # Delu Input constraints
+        constraints += [u[2*k,:] >= -1.5] # Delu Input constraints
+        constraints += [u[2*k+1,:] <= 0.5] 
+        constraints += [u[2*k+1,:] >= -0.5]
         constraints += [u_i[0] + u[2*k,:] <= 20]
-        constraints += [u_i[1] + u[2*k+1,:] <= 1.0]
-        constraints += [u_i[1] + u[2*k+1,:] >= -1.0]
-        constraints += [u_i[0] + u[2*k,:] >= 10.5]
+        constraints += [u_i[1] + u[2*k+1,:] <= 1.5]
+        constraints += [u_i[1] + u[2*k+1,:] >= -1.5]
+        constraints += [u_i[0] + u[2*k,:] >= 1.5]
     constraints += [Ymin - u[2*Nc,:] <= coeff.Y(xr,ur)]
     constraints += [coeff.Y(xr,ur) <= Ymax + u[2*Nc,:]]
     
@@ -152,8 +153,8 @@ def simulate(initial_state,goal,cars,wheels,distance):
         for i in range(Nc):
             # x,phi = pyconnect(2*u[2*i,0],u[2*i+1,0],wheels,car,useRealTimeSim)
             x,phi,midx,midy = pybullet_dynamics.loop(u_old[0]+u[2*i,0],200000,u_old[1]+u[2*i+1,0],wheels,cars,distance)
-            time += 0.01
-        state = np.array([x[0],x[1],phi[2],0.0,0.0,0.0])
+            time += 1./240.
+        state = np.array([(x[0]),(x[1]-20),phi[2],0.0,0.0,0.0])
         x_t = state
         u_t = np.array([u[2*Nc-2,0],u[2*Nc-1,0]])
 
