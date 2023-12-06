@@ -1,0 +1,8 @@
+jax
+numpy
+jaxlib
+flax
+cvxpy
+opencv-python
+pybullet
+matplotlib
