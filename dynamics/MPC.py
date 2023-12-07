@@ -234,9 +234,9 @@ def linearmpc(x_i,u_i,xr,t,midx,midy,Yreff):
     prob = cvx.Problem(cvx.Minimize(cost), constraints) # Optimization problem initialization
     prob.solve(solver=cvx.ECOS,verbose=False) # Solver
     #print(np.sum(Y.value-Yreff))
-    print('status=',prob.status)
+    # print('status=',prob.status)
     # print('cost=',cost.value)
-    print('del_u=',u.value)
+    # print('del_u=',u.value)
     return u.value,u_i,Yreff
 
 # def check_waypoint(state,midx,midy):
