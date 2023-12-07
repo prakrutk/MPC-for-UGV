@@ -150,7 +150,7 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
     for i in range(Np):
         # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(spline(i+1,x_i,x_i[0]+midx,x_i[1]+midy))
         # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(reff(i+1,x_i,x_i[0]+midx,x_i[1]+midy))
-        Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(cubicspline(i+1,xr[0],xr[1],x_i[0]+midx,x_i[1]+midy))
+        # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(cubicspline(i+1,xr[0],xr[1],x_i[0]+midx,x_i[1]+midy))
         Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(trajectory(i+1,xr))
     # print('Yreff=',Yreff)
     the_c=np.concatenate((coeff.theta(xr,ur),np.zeros((3*(Np-Nc),2*Nc))),axis=0)
