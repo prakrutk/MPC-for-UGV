@@ -5,18 +5,18 @@ from Pybullet.racecar_differential import pybullet_dynamics
 import matplotlib as plt
 from scipy.interpolate import CubicSpline
 
-Nc = 50 # Control Horizon
-Np = 100 # Prediction Horizon
+Nc = 15 # Control Horizon
+Np = 25 # Prediction Horizon
 initial_state = np.array([0,0,0,0,0,0,0,0]) # Initial state
 x_i = np.array([0.0,0.0,0.0,0.0,0.0,0.0]) # x,y,theta,xdot,ydot,thetadot
 u_i = np.array([0.0,0.0]) # v,omega
 xr = np.array([0.0,0.0,0.0,0.0,0.0,0.0]) # Reference state
 ur = np.array([0.0,0.0]) # Reference input
 delu = 0.1*np.ones((2*Nc,1)) # Input rate of change
-Yreff = 0.01*np.ones((3*Np,1)) # Reference output
-Q = 1000*np.identity(3*Np) # Weight matrix output 
-R = 10*np.identity(2*Nc) # Weight matrix input
-tolerance = 0.01*np.ones((3*Np,1)) # Tolerance
+Yreff = 0.0*np.ones((3*Np,1)) # Reference output
+Q = 100*np.identity(3*Np) # Weight matrix output 
+R = 1*np.identity(2*Nc) # Weight matrix input
+tolerance = 0.001*np.ones((3*Np,1)) # Tolerance
 Ymax = Yreff + tolerance # Maximum output
 Ymin = Yreff - tolerance # Minimum output
 rho = 1 # Slack variable weight
@@ -44,25 +44,54 @@ coeff = dynamics(state = x_i
 
 # Ynext = coeff.Y(x_i,u_i)
 
-def cubicspline(t,x1,y1,x2,y2):
-    x = np.array([x1,x2])
-    y = np.array([y1,y2])
-    x_interp = np.linspace(np.min(x),np.max(x),Np)
-    x_p = x_interp[t]
-    if t<Np-1:
-        x_p1 = x_interp[t]
-    else:
-        x_p1 = x_interp[t-1]
-    if t<Np-1:
-        x_p2 = x_interp[t+1]
-    else:
-        x_p2 = x_interp[t]
+def cubicspline(xr,x_i,midx,midy):
+    x1=xr[0]
+    y1=xr[1]
+    x2=x_i[0]+midx
+    y2=x_i[1]+midy
+    if x1 < x2 :
+            x = np.array([x1,x2])
+            y = np.array([y1,y2])
+            r = 0
+    else :
+            x = np.array([x2,x1])
+            y = np.array([y2,y1])
+            r = 1
+    Yr = np.zeros((3*Np,1))
+    Yre = np.zeros((3,1))   
+    Yf = np.zeros((3*Np,1))
+    for t in range(Np):    
+        
+        # y = np.array([y1,y2])
+        x_interp = np.linspace(np.min(x),np.max(x),Np)
+        x_p = x_interp[t]
+        y_cubicBC = CubicSpline(x,y, bc_type="natural")
+        y_p = y_cubicBC(x_p)
+        if t<Np-1:
+            x_p1 = x_interp[t]
+            y_p1= y_cubicBC(x_p1)
+        else:
+            x_p1 = x_interp[t-1]
+            y_p1= y_cubicBC(x_p1)
+        if t<Np-1:
+            x_p2 = x_interp[t+1]
+            y_p2= y_cubicBC(x_p2)
+        else:
+            x_p2 = x_interp[t]
+            y_p2= y_cubicBC(x_p2)
+        theta_p=np.arctan(((y_p2-y_p1)/(x_p2-x_p1)))
+        Yre[0] = x_p
+        Yre[1] = y_p 
+        Yre[2] = theta_p
+        Yr[3*t:3*t+3] = Yre
+        Yf[3*t:3*t+3]=np.flip(Yre)
+        #y_p = y_cubicBC(x_p1)
+        # ytemp = np.zeros(y_p.shape[0],y_p.shape[1])
+        # xtemp = np.zeros(x_p.shape[0],x_p.shape[1])
 
-    y_cubicBC = CubicSpline(x,y, bc_type="natural")
-    y_p = y_cubicBC(x_p1)
-    y_p2 = y_cubicBC(x_p2)
-    theta_p = np.arctan(((y_p2-y_p)/(x_p2-x_p1))) 
-    return x_p,y_p,theta_p
+    if r == 1:
+        Yr = np.flip(Yf) 
+    return Yr
 
 def trajectory(i,x_i):
     x = x_i[0] + 0.1*i
@@ -125,7 +154,7 @@ def nearest_index(x,y,x_i,y_i):
     return dist
 
 # Solve the optimization problem
-def linearmpc(x_i,u_i,xr,t,midx,midy):
+def linearmpc(x_i,u_i,xr,t,midx,midy,Yreff):
     dist = 100.0
     for i in range(Np):
         distn = nearest_index(x_i[0],x_i[1],Yreff[3*i],Yreff[3*i+1])
@@ -134,9 +163,14 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
             index = i
     # xr = np.concatenate(Yreff[3*index:3*index+2],np.array([0.0,0.0,0.0]))
     xr[0] = Yreff[3*index]
+    # print('xr[0]=',xr[0])
+    # print('midx_g=',x_i[0]+midx)
+    # print('midy_g=',x_i[1]+midy)
     xr[1] = Yreff[3*index+1]
     xr[2] = Yreff[3*index+2]
-
+    # print('x_i=',x_i)
+    # print('x_i + midx = ',(x_i[0]+midx))
+    # print('x_i + midy = ',(x_i[1]+midy))
     # xr = stateref(xr,x_i,(x_i[0]+midx),(x_i[1]+midy))
     # xr = np.array(stater(0,x_i))
     # print('xr=',xr)
@@ -147,40 +181,48 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
     # u_t=u_t.reshape(2,1)
     cost = 0.0
     constraints = []
-    for i in range(Np):
+    # print(midx)
+    # for i in range(Np):
         # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(spline(i+1,x_i,x_i[0]+midx,x_i[1]+midy))
         # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(reff(i+1,x_i,x_i[0]+midx,x_i[1]+midy))
-        # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(cubicspline(i+1,xr[0],xr[1],x_i[0]+midx,x_i[1]+midy))
-        Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(trajectory(i+1,xr))
+        # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(cubicspline(i,xr[0],xr[1],x_i[0]+midx,x_i[1]+midy))
+    Yreff = cubicspline(xr,x_i,midx,midy)
+    # print('Yreff=',Yreff)
+        # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(trajectory(i,xr))
     # print('Yreff=',Yreff)
     the_c=np.concatenate((coeff.theta(xr,ur),np.zeros((3*(Np-Nc),2*Nc))),axis=0)
     H = np.transpose(the_c).dot(Q).dot(the_c) + R 
     H = np.append(H,np.zeros((1,H.shape[1])),axis=0)
     c = np.zeros((H.shape[0],1))
     c[-1,0] = rho
-    H = np.append(H,c,axis=1)
-    E = coeff.phi(xr,ur).dot(np.concatenate((x_i-xr,u_i-ur),axis=0)).reshape(3*Np,1) - Yreff # Error term
+    H = np.append(H,c,axis=1) 
     stated = x_i - xr
     inputd = u_i - ur
-
     Y= np.array(coeff.phi(xr,ur).dot(np.concatenate((stated,inputd),axis=0)).reshape((3*Np,1))) + the_c@u[0:2*Nc,:]
-    # print('E=',E)
+    E = coeff.phi(xr,ur).dot(np.concatenate((x_i-xr,u_i-ur),axis=0)).reshape(3*Np,1) - Yreff # Error term
+    # E = Y - the_c@u[0:2*Nc,:] - Yreff
+
+
+    # Y= np.array(coeff.phi(xr,ur).dot(np.concatenate((stated,inputd),axis=0)).reshape((3*Np,1))) + the_c@u[0:2*Nc,:]
+    print('E=',E)
     cost += cvx.quad_form(u,H) + 2*np.transpose(E).dot(Q).dot(the_c)@u[0:2*Nc,:] # Cost function
+    # cost += cvx.quad_form(u,H)
     for k in range(Nc):
-        constraints += [u[2*k,:] <= 5.5] # Delu Input constraints
-        constraints += [u[2*k,:] >= -1.5] # Delu Input constraints
-        constraints += [u[2*k+1,:] <= 0.5] 
-        constraints += [u[2*k+1,:] >= -0.5]
-        constraints += [u_i[0] + u[2*k,:] <= 20]
-        constraints += [u_i[1] + u[2*k+1,:] <= 1.5]
-        constraints += [u_i[1] + u[2*k+1,:] >= -1.5]
-        constraints += [u_i[0] + u[2*k,:] >= 1.0]
+        constraints += [u[2*k,:] <= 10.5] # Delu Input constraints
+        constraints += [u[2*k,:] >= -10.5] # Delu Input constraints
+        constraints += [u[2*k+1,:] <= 0.2] 
+        constraints += [u[2*k+1,:] >= -0.2]
+        constraints += [u_i[0] + u[2*k,:] <= 50]
+        constraints += [u_i[1] + u[2*k+1,:] <= 1.]
+        constraints += [u_i[1] + u[2*k+1,:] >= -1.]
+        constraints += [u_i[0] + u[2*k,:] >= -50]
     constraints += [Ymin - u[2*Nc,:] <= Y]
     constraints += [Y <= Ymax + u[2*Nc,:]]
     
     prob = cvx.Problem(cvx.Minimize(cost), constraints) # Optimization problem initialization
     prob.solve()
-    # print(cost.value)
+    # print('cost=',cost.value)
+    # print('del_u=',u.value)
     return u.value,u_i,Yreff
 
 # def check_waypoint(state,midx,midy):
@@ -201,19 +243,19 @@ def simulate(initial_state,goal,cars,wheels,distance,Yreff):
     state = initial_state
     time = 0.0
     u_t = np.array([0.0,0.0])
-    x,phi,midx,midy = pybullet_dynamics.loop(0,200000,0,wheels,cars,distance,Yreff)
+    x,phi,midx,midy = pybullet_dynamics.loop(0,20,0,wheels,cars,distance,Yreff)
     while MAX_TIME >= time:
-        u, u_old,Yreff = linearmpc(state,u_t,xr,time,midx,midy)
+        u, u_old,Yreff = linearmpc(state,u_t,xr,time,midx,midy,Yreff)
         for i in range(Nc):
             # x,phi = pyconnect(2*u[2*i,0],u[2*i+1,0],wheels,car,useRealTimeSim)
-            x,phi,midx,midy = pybullet_dynamics.loop(u_old[0]+u[2*i,0],200000,u_old[1]+u[2*i+1,0],wheels,cars,distance,Yreff)
+            # print('u[2*i,0] + u_old[0]=',u[2*i,0]+u_old[0])
+            # print('u[2*i+1,0] + u_old[1]=',u[2*i+1,0]+u_old[1])
+            x,phi,midx,midy = pybullet_dynamics.loop(u_old[0]+u[2*i,0],20,u_old[1]+u[2*i+1,0],wheels,cars,distance,Yreff)
             time += 1./240.
         state = np.array([(x[0]),(x[1]-20),phi[2],0.0,0.0,0.0])
         # print('state=',state)
         x_t = state
         u_t = np.array([u[2*Nc-2,0],u[2*Nc-1,0]])
-
-        i +=1
         # if check_waypoint(state,midxn,midyn):
         #     midxn,midyn = midx,midy
         if check_goal(state, goal):

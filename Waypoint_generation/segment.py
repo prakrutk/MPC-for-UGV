@@ -130,6 +130,8 @@ class Segment():
         # cv2.waitKey(100000)
         matrix = cv2.getPerspectiveTransform(pts1, pts2)
         transformed_frame = cv2.warpPerspective(image, matrix, (640, 480))
+        # cv2.imshow('image',transformed_frame)
+        # cv2.waitKey(100000)
         imb = self.convert_color_to_black(transformed_frame, target_color)
         target_color = [0,91,136]
         imw = self.convert_color_to_white(imb, target_color)
@@ -143,10 +145,10 @@ class Segment():
         centroid = self.find_surface_centroid(im)
         # print(centroid)
         conversion_factorx = 1./640.
-        conversion_factory = 0.5/480.
+        conversion_factory = 1./480.
         if centroid:
-            midx = (centroid[0]-320)  * conversion_factorx
-            midy = centroid[1] * conversion_factory
+            midy = (320-centroid[0])  * conversion_factorx
+            midx = centroid[1] * conversion_factory
             midp = np.array([midx,midy])
             return midp
         else:
