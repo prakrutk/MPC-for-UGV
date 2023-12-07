@@ -46,13 +46,20 @@ class pybullet_dynamics:
     # p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall4Id,basePosition=[1, -1.5, 0.5])
     # p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall3Id,basePosition=[3.5, 2, 0.5],baseOrientation=p.getQuaternionFromEuler([0,0,67.55]))
     orn = p.getQuaternionFromEuler([0, 0, 0])
+    # car = p.loadURDF("racecar/racecar.urdf", [0, 20, 1],orn)
     car = p.loadURDF("racecar/racecar_differential.urdf",[0,20,1],orn)  #, [0,0,2],useFixedBase=True)
-    # for i in range(p.getNumJoints(car)):
-    #   print(p.getJointInfo(car, i))
+    #box = p.loadURDF("box.urdf", [0, 20, 0.2], orn)  # , [0,0,2],useFixedBase=True)
+    for i in range(p.getNumJoints(car)):
+      print(p.getJointInfo(car, i))
     # mass = 0
     # for i in range(p.getNumJoints(car)):
     #   mass += p.getDynamicsInfo(car, i)[0]
     # print(mass)
+    # inactive_wheels = [3, 5, 7]
+    # wheels = [2]
+
+    # for wheel in inactive_wheels:
+      # p.setJointMotorControl2(car, wheel, p.VELOCITY_CONTROL, targetVelocity=0, force=0)
     for wheel in range(p.getNumJoints(car)):
       p.setJointMotorControl2(car, wheel, p.VELOCITY_CONTROL, targetVelocity=0, force=0)
       p.getJointInfo(car, wheel)
@@ -64,7 +71,7 @@ class pybullet_dynamics:
     wheels = [8, 15]
     print("----------------")
 
-    # p.setJointMotorControl2(car,10,p.VELOCITY_CONTROL,targetVelocity=1,force=10)
+    p.setJointMotorControl2(car,10,p.VELOCITY_CONTROL,targetVelocity=1,force=10)
     c = p.createConstraint(car,
                           9,
                           car,
@@ -147,6 +154,7 @@ class pybullet_dynamics:
 
   def loop(velo, force, delta, wheels, car, distance, Yreff):
     steering = [0, 2]
+    # steering = [4, 6]
     img_w, img_h = 120, 80
     maxForce = force
     targetVelocity = velo
@@ -162,7 +170,7 @@ class pybullet_dynamics:
                               force=maxForce)
 
     for steer in steering:
-      p.setJointMotorControl2(car, steer, p.POSITION_CONTROL, targetPosition=-steeringAngle)
+      p.setJointMotorControl2(car, steer, p.POSITION_CONTROL, targetPosition=steeringAngle)
       agent_pos, agent_orn =p.getBasePositionAndOrientation(car)
 
     yaw = p.getEulerFromQuaternion(agent_orn)[-1]
