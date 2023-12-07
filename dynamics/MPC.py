@@ -14,7 +14,7 @@ xr = np.array([0.0,0.0,0.0,0.0,0.0,0.0]) # Reference state
 ur = np.array([0.0,0.0]) # Reference input
 delu = 0.0*np.ones((2*Nc,1)) # Input rate of change
 Yreff = 0.0*np.ones((3*Np,1)) # Reference output
-Q = 100*np.identity(3*Np) # Weight matrix output 
+Q = 1000*np.identity(3*Np) # Weight matrix output 
 R = 10*np.identity(2*Nc) # Weight matrix input
 tolerance = 0.001*np.ones((3*Np,1)) # Tolerance
 Ymax = Yreff + tolerance # Maximum output
@@ -183,13 +183,13 @@ def linearmpc(x_i,u_i,xr,t,midx,midy,Yreff):
     cost = 0.0
     constraints = []
     # print(midx)
-    for i in range(Np):
+    # for i in range(Np):
         # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(spline(i+1,x_i,x_i[0]+midx,x_i[1]+midy))
         # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(reff(i+1,x_i,x_i[0]+midx,x_i[1]+midy))
         # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(cubicspline(i,xr[0],xr[1],x_i[0]+midx,x_i[1]+midy))
-    # Yreff = cubicspline(xr,x_i,midx,midy)
+    Yreff = cubicspline(xr,x_i,midx,midy)
     # print('Yreff=',Yreff)
-        Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(trajectory(i,xr))
+        # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(trajectory(i,xr))
     # print('Yreff=',Yreff)
     the_c=np.concatenate((coeff.theta(xr,ur),np.zeros((3*(Np-Nc),2*Nc))),axis=0)
     # H = np.transpose(the_c).dot(Q).dot(the_c) + R 
@@ -216,8 +216,8 @@ def linearmpc(x_i,u_i,xr,t,midx,midy,Yreff):
         constraints += [u[2*k+1,:] <= 0.1] 
         constraints += [u[2*k+1,:] >= -0.1]
         constraints += [u_i[0] + u[2*k,:] <= 10]
-        constraints += [u_i[1] + u[2*k+1,:] <= 0.5]
-        constraints += [u_i[1] + u[2*k+1,:] >= -0.5]
+        constraints += [u_i[1] + u[2*k+1,:] <= 1.]
+        constraints += [u_i[1] + u[2*k+1,:] >= -1.]
         constraints += [u_i[0] + u[2*k,:] >= -10]
     # constraints += [u[2*Nc,:] >= -epi]
     # constraints += [u[2*Nc,:] <= epi]

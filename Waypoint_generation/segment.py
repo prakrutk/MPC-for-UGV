@@ -148,7 +148,7 @@ class Segment():
         conversion_factory = 1./480.
         if centroid:
             midy = (320-centroid[0])  * conversion_factorx
-            midx = centroid[1] * conversion_factory
+            midx = (240-centroid[1]) * conversion_factory
             midp = np.array([midx,midy])
             return midp
         else:
