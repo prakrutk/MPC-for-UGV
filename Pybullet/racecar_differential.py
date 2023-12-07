@@ -1,4 +1,5 @@
 import pybullet as p
+import numpy as np
 import time
 import pybullet_data
 import math
@@ -144,7 +145,7 @@ class pybullet_dynamics:
     p.changeConstraint(c, gearRatio=-1, gearAuxLink=15, maxForce=10000)
     return car, wheels, distance
 
-  def loop(velo, force, delta, wheels, car, distance):
+  def loop(velo, force, delta, wheels, car, distance, Yreff):
     steering = [0, 2]
     img_w, img_h = 120, 80
     maxForce = force
@@ -196,9 +197,12 @@ class pybullet_dynamics:
     midpoint = Segment()
     midpo = midpoint.read_video(frame)
     # print(midpo)
+    Yreff = np.array(Yreff)
     if midpo is None:
       midpo = [0,0]
-
+    size=int(Yreff.shape[0]/3)
+    for i in range (size):
+      p.addUserDebugLine([Yreff[3*i,0],20+Yreff[3*i+1,0],0],[Yreff[3*i,0],20+Yreff[3*i+1,0],0.5],[1,0,0],2)
     steering
     if (useRealTimeSim == 0):
       p.stepSimulation()

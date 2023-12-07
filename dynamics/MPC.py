@@ -4,16 +4,16 @@ import cvxpy as cvx
 from Pybullet.racecar_differential import pybullet_dynamics
 import matplotlib as plt
 
-Nc = 5 # Control Horizon
-Np = 10 # Prediction Horizon
+Nc = 50 # Control Horizon
+Np = 100 # Prediction Horizon
 initial_state = np.array([0,0,0,0,0,0,0,0]) # Initial state
 x_i = np.array([0.0,0.0,0.0,0.0,0.0,0.0]) # x,y,theta,xdot,ydot,thetadot
 u_i = np.array([0.0,0.0]) # v,omega
 xr = np.array([0.0,0.0,0.0,0.0,0.0,0.0]) # Reference state
 ur = np.array([0.0,0.0]) # Reference input
 delu = 0.1*np.ones((2*Nc,1)) # Input rate of change
-Yreff = np.ones((3*Np,1)) # Reference output
-Q = 100*np.identity(3*Np) # Weight matrix output 
+Yreff = 0.01*np.ones((3*Np,1)) # Reference output
+Q = 1000*np.identity(3*Np) # Weight matrix output 
 R = 10*np.identity(2*Nc) # Weight matrix input
 tolerance = 0.01*np.ones((3*Np,1)) # Tolerance
 Ymax = Yreff + tolerance # Maximum output
@@ -42,6 +42,24 @@ coeff = dynamics(state = x_i
                 ,Np = Np) 
 
 # Ynext = coeff.Y(x_i,u_i)
+
+def trajectory(i,x_i):
+    x = x_i[0] + 0.1*i
+    y = 0
+    theta = 0
+    xdot = 0
+    ydot = 0
+    thetadot = 0.0
+    return x,y,theta
+
+def stater(i,x_i):
+    x = x_i[0] + 0.1*i
+    y = 0
+    theta = 0
+    xdot = 0
+    ydot = 0
+    thetadot = 0.0
+    return x,y,theta,xdot,ydot,thetadot
 
 # Make a refernce state
 def reff(i,x_i,midx,midy):
@@ -87,24 +105,31 @@ def nearest_index(x,y,x_i,y_i):
 
 # Solve the optimization problem
 def linearmpc(x_i,u_i,xr,t,midx,midy):
-    # dist = 100.0
-    # for i in range(Np):
-    #     distn = nearest_index(x_i[0],x_i[1],Yreff[3*i],Yreff[3*i+1])
-    #     if distn < dist:
-    #         dist = distn
-    #         index = i
+    dist = 100.0
+    for i in range(Np):
+        distn = nearest_index(x_i[0],x_i[1],Yreff[3*i],Yreff[3*i+1])
+        if distn < dist:
+            dist = distn
+            index = i
     # xr = np.concatenate(Yreff[3*index:3*index+2],np.array([0.0,0.0,0.0]))
+    xr[0] = Yreff[3*index]
+    xr[1] = Yreff[3*index+1]
+    xr[2] = Yreff[3*index+2]
 
-    xr = stateref(xr,x_i,(x_i[0]+midx),(x_i[1]+midy))
+    # xr = stateref(xr,x_i,(x_i[0]+midx),(x_i[1]+midy))
+    # xr = np.array(stater(0,x_i))
+    # print('xr=',xr)
     # print('x_i[0] - midx = ',(x_i[0]-midx))
     # print('x_i[1] - midy = ',(x_i[1]-midy))
-    u = cvx.Variable((2*Nc +1,1))
+    u = cvx.Variable((2*Nc+1,1))
+    Y = cvx.Parameter((3*Np,1))
     # u_t=u_t.reshape(2,1)
     cost = 0.0
     constraints = []
     for i in range(Np):
         # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(spline(i+1,x_i,x_i[0]+midx,x_i[1]+midy))
-        Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(reff(i+1,x_i,x_i[0]+midx,x_i[1]+midy))
+        # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(reff(i+1,x_i,x_i[0]+midx,x_i[1]+midy))
+        Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(trajectory(i+1,xr))
     # print('Yreff=',Yreff)
     the_c=np.concatenate((coeff.theta(xr,ur),np.zeros((3*(Np-Nc),2*Nc))),axis=0)
     H = np.transpose(the_c).dot(Q).dot(the_c) + R 
@@ -113,6 +138,10 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
     c[-1,0] = rho
     H = np.append(H,c,axis=1)
     E = coeff.phi(xr,ur).dot(np.concatenate((x_i-xr,u_i-ur),axis=0)).reshape(3*Np,1) - Yreff # Error term
+    stated = x_i - xr
+    inputd = u_i - ur
+
+    Y= np.array(coeff.phi(xr,ur).dot(np.concatenate((stated,inputd),axis=0)).reshape((3*Np,1))) + the_c@u[0:2*Nc,:]
     # print('E=',E)
     cost += cvx.quad_form(u,H) + 2*np.transpose(E).dot(Q).dot(the_c)@u[0:2*Nc,:] # Cost function
     for k in range(Nc):
@@ -123,13 +152,14 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
         constraints += [u_i[0] + u[2*k,:] <= 20]
         constraints += [u_i[1] + u[2*k+1,:] <= 1.5]
         constraints += [u_i[1] + u[2*k+1,:] >= -1.5]
-        constraints += [u_i[0] + u[2*k,:] >= 1.5]
-    constraints += [Ymin - u[2*Nc,:] <= coeff.Y(xr,ur)]
-    constraints += [coeff.Y(xr,ur) <= Ymax + u[2*Nc,:]]
+        constraints += [u_i[0] + u[2*k,:] >= 1.0]
+    constraints += [Ymin - u[2*Nc,:] <= Y]
+    constraints += [Y <= Ymax + u[2*Nc,:]]
     
     prob = cvx.Problem(cvx.Minimize(cost), constraints) # Optimization problem initialization
     prob.solve()
-    return u.value,u_i
+    # print(cost.value)
+    return u.value,u_i,Yreff
 
 # def check_waypoint(state,midx,midy):
 #     if abs(state[0] - midx) < 0.05 and abs(state[1] - midy) <0.05:
@@ -144,19 +174,20 @@ def check_goal(state, goal):
     else:
         return False
 
-def simulate(initial_state,goal,cars,wheels,distance):
+def simulate(initial_state,goal,cars,wheels,distance,Yreff):
     goal = goal 
     state = initial_state
     time = 0.0
     u_t = np.array([0.0,0.0])
-    x,phi,midx,midy = pybullet_dynamics.loop(0,200000,0,wheels,cars,distance)
+    x,phi,midx,midy = pybullet_dynamics.loop(0,200000,0,wheels,cars,distance,Yreff)
     while MAX_TIME >= time:
-        u, u_old = linearmpc(state,u_t,xr,time,midx,midy)
+        u, u_old,Yreff = linearmpc(state,u_t,xr,time,midx,midy)
         for i in range(Nc):
             # x,phi = pyconnect(2*u[2*i,0],u[2*i+1,0],wheels,car,useRealTimeSim)
-            x,phi,midx,midy = pybullet_dynamics.loop(u_old[0]+u[2*i,0],200000,u_old[1]+u[2*i+1,0],wheels,cars,distance)
+            x,phi,midx,midy = pybullet_dynamics.loop(u_old[0]+u[2*i,0],200000,u_old[1]+u[2*i+1,0],wheels,cars,distance,Yreff)
             time += 1./240.
         state = np.array([(x[0]),(x[1]-20),phi[2],0.0,0.0,0.0])
+        # print('state=',state)
         x_t = state
         u_t = np.array([u[2*Nc-2,0],u[2*Nc-1,0]])
 
@@ -170,7 +201,7 @@ def main():
     cars,wheels,distance = pybullet_dynamics.sim()
     initial_state = np.array([0,0,0,0,0,0])
     goal = np.array([-3,0,0,0,0,0])
-    simulate(initial_state,goal,cars,wheels,distance)
+    simulate(initial_state,goal,cars,wheels,distance,Yreff)
 
 if __name__ == '__main__':
     main()

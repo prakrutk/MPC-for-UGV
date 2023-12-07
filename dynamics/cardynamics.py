@@ -46,7 +46,7 @@ class dynamics(struct.PyTreeNode):
         return yddot
 
     def f6(self, x, u):
-        psiddot = jnp.sum((self.lf*(self.cl*self.sf*u[0]+self.cc*self.alphaf)-self.cc*self.alphaf*self.lr)/self.iz)
+        psiddot = jnp.sum((self.lf*(self.cl*self.sf*u[1]+self.cc*self.alphaf)-self.cc*self.alphaf*self.lr)/self.iz)
         return psiddot
     
     def A(self, x, u):
@@ -117,7 +117,7 @@ class dynamics(struct.PyTreeNode):
             if i==0:
                 the = row
             else:    
-                the = np.append(the,row,axis=0)
+                the = jnp.append(the,row,axis=0)
         
         return the
     
