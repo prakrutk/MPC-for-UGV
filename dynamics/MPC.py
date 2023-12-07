@@ -3,6 +3,7 @@ from dynamics.cardynamics import dynamics
 import cvxpy as cvx
 from Pybullet.racecar_differential import pybullet_dynamics
 import matplotlib as plt
+from scipy.interpolate import CubicSpline
 
 Nc = 50 # Control Horizon
 Np = 100 # Prediction Horizon
@@ -42,6 +43,26 @@ coeff = dynamics(state = x_i
                 ,Np = Np) 
 
 # Ynext = coeff.Y(x_i,u_i)
+
+def cubicspline(t,x1,y1,x2,y2):
+    x = np.array([x1,x2])
+    y = np.array([y1,y2])
+    x_interp = np.linspace(np.min(x),np.max(x),Np)
+    x_p = x_interp[t]
+    if t<Np-1:
+        x_p1 = x_interp[t]
+    else:
+        x_p1 = x_interp[t-1]
+    if t<Np-1:
+        x_p2 = x_interp[t+1]
+    else:
+        x_p2 = x_interp[t]
+
+    y_cubicBC = CubicSpline(x,y, bc_type="natural")
+    y_p = y_cubicBC(x_p1)
+    y_p2 = y_cubicBC(x_p2)
+    theta_p = np.arctan(((y_p2-y_p)/(x_p2-x_p1))) 
+    return x_p,y_p,theta_p
 
 def trajectory(i,x_i):
     x = x_i[0] + 0.1*i
@@ -129,6 +150,7 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
     for i in range(Np):
         # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(spline(i+1,x_i,x_i[0]+midx,x_i[1]+midy))
         # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(reff(i+1,x_i,x_i[0]+midx,x_i[1]+midy))
+        Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(cubicspline(i+1,xr[0],xr[1],x_i[0]+midx,x_i[1]+midy))
         Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(trajectory(i+1,xr))
     # print('Yreff=',Yreff)
     the_c=np.concatenate((coeff.theta(xr,ur),np.zeros((3*(Np-Nc),2*Nc))),axis=0)
