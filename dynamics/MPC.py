@@ -4,8 +4,8 @@ import cvxpy as cvx
 from Pybullet.racecar_differential import pybullet_dynamics
 import matplotlib as plt
 
-Nc = 5 # Control Horizon
-Np = 10 # Prediction Horizon
+Nc = 10 # Control Horizon
+Np = 25 # Prediction Horizon
 initial_state = np.array([0,0,0,0,0,0,0,0]) # Initial state
 x_i = np.array([0.0,0.0,0.0,0.0,0.0,0.0]) # x,y,theta,xdot,ydot,thetadot
 u_i = np.array([0.0,0.0]) # v,omega
@@ -98,7 +98,8 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
     xr = stateref(xr,x_i,(x_i[0]+midx),(x_i[1]+midy))
     # print('x_i[0] - midx = ',(x_i[0]-midx))
     # print('x_i[1] - midy = ',(x_i[1]-midy))
-    u = cvx.Variable((2*Nc +1,1))
+    u = cvx.Variable((2*Nc+1,1))
+    Y = cvx.Parameter((3*Np,1))
     # u_t=u_t.reshape(2,1)
     cost = 0.0
     constraints = []
@@ -113,6 +114,10 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
     c[-1,0] = rho
     H = np.append(H,c,axis=1)
     E = coeff.phi(xr,ur).dot(np.concatenate((x_i-xr,u_i-ur),axis=0)).reshape(3*Np,1) - Yreff # Error term
+    stated = x_i - xr
+    inputd = u_i - ur
+
+    Y= np.array(coeff.phi(xr,ur).dot(np.concatenate((stated,inputd),axis=0)).reshape((3*Np,1))) + the_c@u[0:2*Nc,:]
     # print('E=',E)
     cost += cvx.quad_form(u,H) + 2*np.transpose(E).dot(Q).dot(the_c)@u[0:2*Nc,:] # Cost function
     for k in range(Nc):
@@ -124,11 +129,12 @@ def linearmpc(x_i,u_i,xr,t,midx,midy):
         constraints += [u_i[1] + u[2*k+1,:] <= 1.5]
         constraints += [u_i[1] + u[2*k+1,:] >= -1.5]
         constraints += [u_i[0] + u[2*k,:] >= 1.5]
-    constraints += [Ymin - u[2*Nc,:] <= coeff.Y(xr,ur)]
-    constraints += [coeff.Y(xr,ur) <= Ymax + u[2*Nc,:]]
+    constraints += [Ymin - u[2*Nc,:] <= Y]
+    constraints += [Y <= Ymax + u[2*Nc,:]]
     
     prob = cvx.Problem(cvx.Minimize(cost), constraints) # Optimization problem initialization
     prob.solve()
+    print(cost.value)
     return u.value,u_i
 
 # def check_waypoint(state,midx,midy):

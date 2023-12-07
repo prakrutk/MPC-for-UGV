@@ -101,9 +101,9 @@ class Segment():
             if M["m00"] != 0:
                 cx = int(M["m10"] / M["m00"])
                 cy = int(M["m01"] / M["m00"])
-                cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
-                cv2.imshow('frame',frame)
-                cv2.waitKey(100)
+                # cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
+                # cv2.imshow('frame',frame)
+                # cv2.waitKey(100)
                 return cx, cy
             
         # Plot the centroid in the frame
