@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
-from flax import struct
+# import matplotlib.pyplot as plt
+# from flax import struct
 
 # vidcap = cv2.VideoCapture("Waypoint_generation/Test.mp4")
 # success, image = vidcap.read()

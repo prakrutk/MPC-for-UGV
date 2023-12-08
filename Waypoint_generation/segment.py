@@ -120,7 +120,8 @@ class Segment():
         bl = (0, 480)
         tr = (550, 387)
         br = (640, 480)
-
+        midx = np.zeros(10)
+        midy = np.zeros(10)
         pts1 = np.float32([tl, bl, tr, br])
         pts2 = np.float32([[0, 0], [0, 480], [640, 0], [640, 480]])
 
@@ -144,13 +145,13 @@ class Segment():
         # cv2.waitKey(100000)
         centroid = self.find_surface_centroid(im)
         # print(centroid)
-        conversion_factorx = 1./640.
-        conversion_factory = 1./480.
+        conversion_factory = 1./640.
+        conversion_factorx = 1./480.
         if centroid:
-            midy = (320-centroid[0])  * conversion_factorx
-            midx = (240-centroid[1]) * conversion_factory
-            midp = np.array([midx,midy])
-            return midp
+            midy = (320-centroid[0])  * conversion_factory
+            midx = (centroid[1]) * conversion_factorx
+            # midp = np.array([midx,midy])
+            return midx,midy
         else:
-            return None
+            return None,None
 

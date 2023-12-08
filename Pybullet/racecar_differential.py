@@ -37,7 +37,7 @@ class pybullet_dynamics:
     #                                   halfExtents=[0.05,1.5,0.5])
     # Wall4Id = p.createCollisionShape(p.GEOM_BOX,
     #                                   halfExtents=[0.05,3.5,0.5])
-    # p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[3, 20, 0.5])
+    #p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[4, 20, 0.5])
     # p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[0, 5, 0.5],baseOrientation=p.getQuaternionFromEuler([0,0,67.55]))
     # p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[0, -5, 0.5],baseOrientation=p.getQuaternionFromEuler([0,0,-67.55]))
     # p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[-5, 0, 0.5])
@@ -48,9 +48,9 @@ class pybullet_dynamics:
     orn = p.getQuaternionFromEuler([0, 0, 0])
     # car = p.loadURDF("racecar/racecar.urdf", [0, 20, 1],orn)
     car = p.loadURDF("racecar/racecar_differential.urdf",[0,20,1],orn)  #, [0,0,2],useFixedBase=True)
-    #box = p.loadURDF("box.urdf", [0, 20, 0.2], orn)  # , [0,0,2],useFixedBase=True)
-    for i in range(p.getNumJoints(car)):
-      print(p.getJointInfo(car, i))
+    # box = p.loadURDF("Pybullet/box.urdf", [0, 20, 0.2], orn)  # , [0,0,2],useFixedBase=True)
+    # for i in range(p.getNumJoints(car)):
+      # print(p.getJointInfo(car, i))
     # mass = 0
     # for i in range(p.getNumJoints(car)):
     #   mass += p.getDynamicsInfo(car, i)[0]
@@ -67,6 +67,8 @@ class pybullet_dynamics:
     for i in range(100):
       p.stepSimulation()
       time.sleep(1. / 240.)
+
+    # p.resetBaseVelocity(box, [10, 0, 0], [0, 0, 0])
 
     wheels = [8, 15]
     print("----------------")
@@ -151,6 +153,7 @@ class pybullet_dynamics:
                           childFramePosition=[0, 0, 0])
     p.changeConstraint(c, gearRatio=-1, gearAuxLink=15, maxForce=10000)
     return car, wheels, distance
+    # return box, wheels, distance
 
   def loop(velo, force, delta, wheels, car, distance, Yreff):
     steering = [0, 2]
@@ -160,6 +163,7 @@ class pybullet_dynamics:
     targetVelocity = velo
     steeringAngle = delta
     useRealTimeSim = 1
+    # velo.new_method(car, targetVelocity)
     #print(targetVelocity)
 
     for wheel in wheels:
@@ -168,10 +172,26 @@ class pybullet_dynamics:
                               p.VELOCITY_CONTROL,
                               targetVelocity=targetVelocity,
                               force=maxForce)
+    # p.setJointMotorControlArray(car, steering, p.POSITION_CONTROL, targetPositions=steeringAngle)
 
+    # print(steeringAngle)
     for steer in steering:
       p.setJointMotorControl2(car, steer, p.POSITION_CONTROL, targetPosition=steeringAngle)
-      agent_pos, agent_orn =p.getBasePositionAndOrientation(car)
+    # p.setJointMotorControl2(car, 0, p.POSITION_CONTROL, targetPosition=steeringAngle)
+    # p.setJointMotorControl2(car, 2, p.POSITION_CONTROL, targetPosition=steeringAngle)
+    # p.setJointMotorControl2(car, 2, p.POSITION_CONTROL, targetPosition=steeringAngle)
+    # print(p.getJointInfo(car, 2))
+    # p.setJointMotorControl2(car, 0, p.POSITION_CONTROL, targetPosition=steeringAngle)
+    # agent_pos, agent_orn =p.getBasePositionAndOrientation(car)
+    # omega = (targetVelocity*(0.5 + steeringAngle))/2*0.5
+    # print(omega)
+    # p.resetBaseVelocity(car, [tx, ty, 0], [0, 0, omega])
+    # p.setJointMotorControl2(car, 0, p.POSITION_CONTROL, targetPosition=-steeringAngle)
+    # print('steeringangle=',steeringAngle)
+    # print('wheel0=',p.getJointState(car, 0)[0])
+    # print('wheel2=',p.getJointState(car, 2)[0])
+    agent_pos, agent_orn = p.getBasePositionAndOrientation(car)
+    # p.resetBasePositionAndOrientation(car, [0, 20, 1], [0, 0, 0, 1])
 
     yaw = p.getEulerFromQuaternion(agent_orn)[-1]
     xA, yA, zA = agent_pos
@@ -203,16 +223,27 @@ class pybullet_dynamics:
     # midpoint = PerspectiveTransform()
     # midx, midy = midpoint.midpoint(frame)
     midpoint = Segment()
-    midpo = midpoint.read_video(frame)
+    midx,midy = midpoint.read_video(frame)
     # print(midpo)
     Yreff = np.array(Yreff)
-    if midpo is None:
-      midpo = [0,0]
+    if midx is None:
+      midx = [0,0]
     size=int(Yreff.shape[0]/3)
     for i in range (size):
-      p.addUserDebugLine([Yreff[3*i,0],20+Yreff[3*i+1,0],0],[Yreff[3*i,0],20+Yreff[3*i+1,0],0.5],[1,0,0],2)
+      p.addUserDebugLine([Yreff[3*i,0],Yreff[3*i+1,0] + 20,0],[Yreff[3*i,0],Yreff[3*i+1,0] + 20,0.5],[1,0,0],2)
     steering
     if (useRealTimeSim == 0):
       p.stepSimulation()
     pos, orn = p.getBasePositionAndOrientation(car)
-    return pos,orn,midpo[0],midpo[1]
+    vel, omega = p.getBaseVelocity(car)
+
+    orn = p.getEulerFromQuaternion(orn)
+    # print('Midpoint=',midpo)
+    # print(pos)
+    return pos,orn,midx,midy,vel,omega
+
+  # def new_method(velo, car, targetVelocity):
+  #     pos,orn = p.getBasePositionAndOrientation(car)
+  #     orn = p.getEulerFromQuaternion(orn)
+  #     tx = targetVelocity*math.cos(orn[2])
+  #     ty = targetVelocity*math.sin(orn[2])
