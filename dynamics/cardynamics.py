@@ -78,7 +78,8 @@ class dynamics(struct.PyTreeNode):
         a4 = grad(self.f4, 0)(xr, ur)
         a5 = grad(self.f5, 0)(xr, ur)
         a6 = grad(self.f6, 0)(xr, ur)
-        A = np.identity(6) + self.T*np.stack((a1,a2,a3,a4,a5,a6), axis=1)
+        A = np.identity(6) + self.T*np.stack((a1,a2,a3,a4,a5,a6), axis=0)
+        # print('A=',A.shape)
         # print(A)
         return A
     
@@ -94,6 +95,7 @@ class dynamics(struct.PyTreeNode):
 
         B = self.T*np.stack((b1,b2,b3,b4,b5,b6), axis=0)
         # print(B)
+        # print('B=',B.shape)
         return B
     
     def pri(self,x,u):
@@ -101,6 +103,8 @@ class dynamics(struct.PyTreeNode):
         ur = u
         A_p1 = np.column_stack((self.A(xr, ur), self.B(xr, ur)))
         A_p2 = np.column_stack((np.zeros((2,6)), np.identity(2)))
+        # print('A_p1=',A_p1)
+        # print('A_p2=',A_p2.shape)
         A_p = np.row_stack((A_p1, A_p2))
 
         B_p = np.row_stack((self.B(xr, ur), np.identity(2)))
@@ -124,8 +128,12 @@ class dynamics(struct.PyTreeNode):
         A_p, B_p = self.pri(x,u)
         C_p = self.C(x, u)
         phi = C_p.dot(A_p)
+        # print('phi=',phi)
+        # print(C_p.dot(np.power(A_p,1)))
         for i in range(self.Np-1):
             phi = np.append(phi,C_p.dot(np.power(A_p,(i+2))),axis=0)
+            print('i=',i,'phi=',phi)
+        # print('phi=',phi.shape)
         return phi
     
     def theta(self,x,u):

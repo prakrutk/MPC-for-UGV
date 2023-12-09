@@ -162,7 +162,7 @@ class pybullet_dynamics:
     maxForce = force
     targetVelocity = velo
     steeringAngle = delta
-    useRealTimeSim = 1
+    useRealTimeSim = 0
     # velo.new_method(car, targetVelocity)
     #print(targetVelocity)
 

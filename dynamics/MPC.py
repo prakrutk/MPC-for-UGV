@@ -204,13 +204,13 @@ def linearmpc(x_i,u_i,xr,t,midx,midy,Yreff):
     cost = 0.0
     constraints = []
     # print(midx)
-    #for i in range(Np):
+    # for i in range(Np):
         # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(spline(i+1,x_i,x_i[0]+midx,x_i[1]+midy))
         # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(reff(i+1,x_i,x_i[0]+midx,x_i[1]+midy))
         # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(cubicspline(i,xr[0],xr[1],x_i[0]+midx,x_i[1]+midy))
     Yreff = cubicspline(xr,x_i,midx,midy)
     # print('Yreff=',Yreff)
-        #Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(trajectory(i,xr))
+        # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(trajectory(i,xr))
     # print('Yreff=',Yreff)
     the_c=np.concatenate((coeff.theta(xr,ur),np.zeros((3*(Np-Nc),2*Nc))),axis=0)
     H = np.transpose(the_c).dot(Q).dot(the_c) + R 
@@ -238,8 +238,8 @@ def linearmpc(x_i,u_i,xr,t,midx,midy,Yreff):
         constraints += [u[2*k+1,:] <= 0.05] 
         constraints += [u[2*k+1,:] >= -0.05]
         constraints += [u_i[0] + u[2*k,:] <= 5]
-        constraints += [u_i[1] + u[2*k+1,:] <= 0.1]
-        constraints += [u_i[1] + u[2*k+1,:] >= -0.1]
+        constraints += [u_i[1] + u[2*k+1,:] <= 0.5]
+        constraints += [u_i[1] + u[2*k+1,:] >= -0.5]
         constraints += [u_i[0] + u[2*k,:] >= -5]
     # constraints += [u[2*Nc,:] >= -epi]
     # constraints += [u[2*Nc,:] <= epi]
@@ -256,8 +256,8 @@ def linearmpc(x_i,u_i,xr,t,midx,midy,Yreff):
     prob = cvx.Problem(cvx.Minimize(cost), constraints) # Optimization problem initialization
     # prob.solve(solver=cvx.ECOS,verbose=False) # Solver
     prob.solve()
-    print()
-    print(Y.value-Yreff)
+    # print()
+    # print(Y.value-Yreff)
     # print('status=',prob.status)
     # print('cost=',cost.value)
     #print('del_u=',u.value)
@@ -287,12 +287,12 @@ def simulate(initial_state,goal,cars,wheels,distance,Yreff):
         u, u_old,Yreff = linearmpc(state,u_t,xr,time,midx,midy,Yreff)
         for i in range(Nc):
             # x,phi = pyconnect(2*u[2*i,0],u[2*i+1,0],wheels,car,useRealTimeSim)
-            print('u[2*i,0] + u_old[0]=',u[2*i,0]+u_old[0])
-            print('u[2*i+1,0] + u_old[1]=',u[2*i+1,0]+u_old[1])
+            # print('u[2*i,0] + u_old[0]=',u[2*i,0]+u_old[0])
+            # print('u[2*i+1,0] + u_old[1]=',u[2*i+1,0]+u_old[1])
             x,phi,midx,midy,vel,omega = pybullet_dynamics.loop(u_old[0]+u[2*i,0],10,u_old[1]+u[2*i+1,0],wheels,cars,distance,Yreff)
             time += 1./240.
         state = np.array([(x[0]),(x[1] - 20),phi[2],vel[0],vel[1],omega[2]])
-        print('state=',state)
+        # print('state=',state)
         # j+=1
         # print('corresponding Yreff=',Yreff[3*Nc:3*Nc+3])
         # plt.cla()

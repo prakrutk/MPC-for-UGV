@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import PIL.Image as Image
 
 class Segment():
 
@@ -120,15 +121,20 @@ class Segment():
         bl = (0, 480)
         tr = (550, 387)
         br = (640, 480)
-        midx = np.zeros(10)
-        midy = np.zeros(10)
+        # midx = np.zeros(10)
+        # midy = np.zeros(10)
         pts1 = np.float32([tl, bl, tr, br])
         pts2 = np.float32([[0, 0], [0, 480], [640, 0], [640, 480]])
-
+        frame = Image.fromarray(frame)
+        frame = frame.convert('RGB')
+        frame = np.array(frame) 
+        # cv2.imshow('frame',frame)
+        # cv2.waitKey(100000)
+        # frame = cv2.imread(frame)
         target_color = [0, 40, 0]
         image = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        # cv2.imshow('image',image)   
-        # cv2.waitKey(100000)
+        cv2.imshow('image',image)   
+        cv2.waitKey(100000)
         matrix = cv2.getPerspectiveTransform(pts1, pts2)
         transformed_frame = cv2.warpPerspective(image, matrix, (640, 480))
         # cv2.imshow('image',transformed_frame)
