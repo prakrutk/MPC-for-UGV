@@ -15,5 +15,7 @@ dynamics/MPC_Steer_speed.py
 dynamics/MPC_System.py
 dynamics/__init__.py
 dynamics/cardynamics.py
+dynamics/carkinematics.py
 dynamics/cubic_spline_planner.py
 dynamics/testing.py
+dynamics/testingk.py

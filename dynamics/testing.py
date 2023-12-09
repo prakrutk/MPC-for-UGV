@@ -3,11 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Define the car model
-Nc = 3# Control Horizon
-Np = 5# Prediction Horizon
+Nc = 10# Control Horizon
+Np = 20# Prediction Horizon
 initial_state = np.array([0,0,0,0,0,0,0,0]) # Initial state
-x_i = np.array([1.0,1.0,1.0,1.0,1.0,1.0]) # x,y,theta,xdot,ydot,thetadot
-u_i = np.array([1.0,0.0]) # v,omega
+x_i = np.array([0.0,0.0,0.0,1.0,1.0,1.0]) # x,y,theta,xdot,ydot,thetadot
+u_i = np.array([0.0,0.0]) # v,omega
 xr = np.array([0.0,0.0,0.0,0.0,0.0,0.0]) # Reference state
 ur = np.array([0.0,0.0]) # Reference input
 delu = 0.0*np.ones((2*Nc,1)) # Input rate of change

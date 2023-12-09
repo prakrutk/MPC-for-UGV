@@ -35,7 +35,9 @@ class dynamics(struct.PyTreeNode):
             alphaf = 0
         else:
             alphaf = (self.lr + self.lf)*x[5]/x[3] - u[1]
-        ydot = np.sum(u[0]*(alphaf+u[1])-self.lr*x[5])
+        ydot = np.sum(x[3]*(alphaf+u[1])-self.lr*x[5])
+        # ydot = np.sum(u[0]*(alphaf+u[1])-self.lr*x[5])
+        # ydot = np.sum(u[0]*(alphaf + u[1])/2)
         return ydot
 
     def f3(self, x, u):
@@ -44,7 +46,9 @@ class dynamics(struct.PyTreeNode):
             alphaf = 0
         else:
             alphaf = (self.lr + self.lf)*x[5]/x[3] - u[1]
-        psidot = np.sum(x[3]*(alphaf + u[1])/2*self.lr)
+        # psidot = np.sum(x[5])
+        psidot = np.sum(x[4]/self.lr)
+        # psidot = np.sum(x[3]*(alphaf + u[1])/2*self.lr)
         return psidot
 
     def f4(self, x, u):
@@ -53,7 +57,8 @@ class dynamics(struct.PyTreeNode):
             alphaf = 0
         else:
             alphaf = (self.lr + self.lf)*x[5]/x[3] - u[1]
-        xddot = np.sum((self.cl*self.sf-self.cc*alphaf*u[1]+self.cl*self.sr+self.m*x[4]*x[5])/self.m)
+        # xddot = np.sum((self.cl*self.sf-self.cc*alphaf*u[1]+self.cl*self.sr+self.m*x[4]*x[5])/self.m)
+        xddot = np.sum((self.m*x[4]*x[5]-self.cc*alphaf*u[1])/self.m)
         return xddot
 
     def f5(self, x, u):
@@ -62,7 +67,8 @@ class dynamics(struct.PyTreeNode):
             alphaf = 0
         else:
             alphaf = (self.lr + self.lf)*x[5]/x[3] - u[1]
-        yddot = np.sum((self.cc*alphaf+self.cl*self.sf*u[1]+self.cc*alphaf-self.m*x[3]*x[5])/self.m)
+        # yddot = np.sum((self.cc*alphaf+self.cl*self.sf*u[1]+self.cc*alphaf-self.m*x[3]*x[5])/self.m)
+        yddot = np.sum((-self.m*x[3]*x[5]+self.cc*alphaf)/self.m)
         return yddot
 
     def f6(self, x, u):
@@ -84,7 +90,7 @@ class dynamics(struct.PyTreeNode):
         a5 = grad(self.f5, 0)(xr, ur)
         a6 = grad(self.f6, 0)(xr, ur)
         A = np.identity(6) + self.T*np.stack((a1,a2,a3,a4,a5,a6), axis=0)
-        # print('A=',A.shape)
+        # print('A=',A)
         # print(A)
         return A
     
@@ -100,7 +106,7 @@ class dynamics(struct.PyTreeNode):
 
         B = self.T*np.stack((b1,b2,b3,b4,b5,b6), axis=0)
         # print(B)
-        # print('B=',B.shape)
+        # print('B=',B)
         return B
     
     def pri(self,x,u):
@@ -153,7 +159,7 @@ class dynamics(struct.PyTreeNode):
             for j in range(self.Nc):
                 if j<i:
                     # print(the[3*i:3*i+3,2*j:2*j+2].shape)
-                    row[:,2*j:2*j+2] = C_p.dot(np.power(A_p,(self.Np-1-j)).dot(B_p))
+                    row[:,2*j:2*j+2] = C_p.dot(np.power(A_p,(i-j)).dot(B_p))
                     # print('i=',i,'j=',j,'row=',row)
                 elif j==i:
                     row[:,2*j:2*j+2] = C_p.dot(B_p)
@@ -177,6 +183,10 @@ class dynamics(struct.PyTreeNode):
     def Y(self,x,u,delu):
         stated = self.state - x
         inputd = self.input - u
+        # print('stated=',stated)
+        # print('inputd=',inputd)
+        # print('delu=',delu)
+        # print('np.concatenate((stated,inputd),axis=0)=',np.concatenate((stated,inputd),axis=0))
         Y1 = self.phi(x,u).dot(np.concatenate((stated,inputd),axis=0)).reshape((3*self.Np,1)) 
         Y2 = self.theta(x,u).dot(delu)
         Y2 = np.append(Y2,np.zeros(((Y1.shape[0] - Y2.shape[0]),1)),axis=0)

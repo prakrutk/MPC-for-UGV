@@ -5,13 +5,17 @@ from Pybullet.racecar_differential import pybullet_dynamics
 import matplotlib.pyplot as plt
 from scipy.interpolate import CubicSpline
 from math import sin, cos, tan, atan2, sqrt, pi
+from dynamics.carkinematics import Kinematics
 
 Nc = 10# Control Horizon
 Np = 20# Prediction Horizon
-initial_state = np.array([0,0,0,0,0,0,0,0]) # Initial state
-x_i = np.array([0.0,0.0,0.0,0.0,0.0,0.0]) # x,y,theta,xdot,ydot,thetadot
+# initial_state = np.array([0,0,0,0,0,0,0,0]) # Initial state
+# x_i = np.array([0.0,0.0,0.0,0.0,0.0,0.0]) # x,y,theta,xdot,ydot,thetadot
+initial_state = np.array([0,0,0,0,0,0]) # Initial state
+x_i = np.array([0.0,0.0,0.0,0.0]) # x,y,theta,xdot,ydot,thetadot
 u_i = np.array([0.0,0.0]) # v,omega
-xr = np.array([0.0,0.0,0.0,0.0,0.0,0.0]) # Reference state
+xr = np.array([0.0,0.0,0.0,0.0]) # Reference state
+# xr = np.array([0.0,0.0,0.0,0.0,0.0,0.0]) # Reference state
 ur = np.array([0.0,0.0]) # Reference input
 delu = 0.0*np.ones((2*Nc,1)) # Input rate of change
 Yreff = 0.0*np.ones((3*Np,1)) # Reference output
@@ -42,9 +46,9 @@ coeff = dynamics(state = x_i
                 ,stater = xr
                 ,delu = delu
                 ,cl = 0.7
-                ,sf = 0.1
+                ,sf = 0.0
                 ,cc = 8.2
-                ,sr = 0.1
+                ,sr = 0.0
                 ,m = 6.38
                 ,alphaf = (5./360.)*2*np.pi
                 ,lf = 0.1
@@ -53,6 +57,18 @@ coeff = dynamics(state = x_i
                 ,T = 1./240.
                 ,Nc = Nc
                 ,Np = Np) 
+
+kine = Kinematics(state = x_i,
+                input = u_i,
+                inputr = ur,
+                stater = xr,
+                delu = delu,
+                lf = 0.1,
+                lr = 0.1,
+                T = 1./240.,
+                Nc = Nc,
+                Np = Np)
+
 
 # Ynext = coeff.Y(x_i,u_i)
 
@@ -111,7 +127,7 @@ def trajectory(i,x_i):
     x = x_i[0] + 0.1*i
     y = 0
     # y = x_i[1] + 0.1*i
-    theta = 0
+    theta = -pi/4
     xdot = 0
     ydot = 0
     thetadot = 0.0
@@ -121,7 +137,7 @@ def stater(i,x_i):
     x = x_i[0] + 0.1*i
     y = 0
     # y = x_i[1] + 0.1*i
-    theta = 0
+    theta = -pi/4
     xdot = 0
     ydot = 0
     thetadot = 0.0
@@ -184,10 +200,10 @@ def linearmpc(x_i,u_i,xr,t,midx,midy,Yreff):
     # print('midy_g=',x_i[1]+midy)
     xr[1] = Yreff[3*index+1]
     xr[2] = Yreff[3*index+2]
-    xr[3] = (Yreff[3*index+3] - Yreff[3*index])*240
-    xr[4] = (Yreff[3*index+4] - Yreff[3*index+1])*240
-    xr[5] = (Yreff[3*index+5] - Yreff[3*index+2])*240
-    print(xr)
+    # xr[3] = (Yreff[3*index+3] - Yreff[3*index])*240
+    # xr[4] = (Yreff[3*index+4] - Yreff[3*index+1])*240
+    # xr[5] = (Yreff[3*index+5] - Yreff[3*index+2])*240
+    # print(xr)
     # print('x_i=',x_i)
     # print('x_i + midx = ',(x_i[0]+midx))
     # print('x_i + midy = ',(x_i[1]+midy))
@@ -204,24 +220,36 @@ def linearmpc(x_i,u_i,xr,t,midx,midy,Yreff):
     cost = 0.0
     constraints = []
     # print(midx)
-    for i in range(Np):
+    if t <= 100/240:
+        for i in range(Np):
         # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(spline(i+1,x_i,x_i[0]+midx,x_i[1]+midy))
         # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(reff(i+1,x_i,x_i[0]+midx,x_i[1]+midy))
         # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(cubicspline(i,xr[0],xr[1],x_i[0]+midx,x_i[1]+midy))
     # Yreff = cubicspline(xr,x_i,midx,midy)
     # print('Yreff=',Yreff)
-        Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(trajectory(i,xr))
+            Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(trajectory(i,xr))
     # print('Yreff=',Yreff)
-    the_c=np.concatenate((coeff.theta(xr,ur),np.zeros((3*(Np-Nc),2*Nc))),axis=0)
+    the_c=np.concatenate((kine.theta(xr,ur),np.zeros((3*(Np-Nc),2*Nc))),axis=0)
     H = np.transpose(the_c).dot(Q).dot(the_c) + R 
     H = np.append(H,np.zeros((1,H.shape[1])),axis=0)
     c = np.zeros((H.shape[0],1))
     c[-1,0] = rho
+    # H = np.append(H,c,axis=1)
+    # the_c=np.concatenate((coeff.theta(xr,ur),np.zeros((3*(Np-Nc),2*Nc))),axis=0)
+    # H = np.transpose(the_c).dot(Q).dot(the_c) + R 
+    # H = np.append(H,np.zeros((1,H.shape[1])),axis=0)
+    # c = np.zeros((H.shape[0],1))
+    # c[-1,0] = rho
     H = np.append(H,c,axis=1) 
-    stated = x_i - xr
-    inputd = u_i - ur
-    Y= np.array(coeff.phi(xr,ur).dot(np.concatenate((stated,inputd),axis=0)).reshape((3*Np,1))) + the_c@u[0:2*Nc,:]
-    E = coeff.phi(xr,ur).dot(np.concatenate((x_i-xr,u_i-ur),axis=0)).reshape(3*Np,1) - Yreff # Error term
+    stated = x_i -xr
+    inputd = u_i -ur
+    x_i_g = x_i[0:3]
+    for i in range(Np-1):
+        x_i_g = np.append(x_i_g,x_i[3*(i+1):3*(i+1)+3],axis = 0)
+    # Y= x_i_g + np.array(coeff.phi(xr,ur).dot(np.concatenate((stated,inputd),axis=0)).reshape((3*Np,1))) + the_c@u[0:2*Nc,:]
+    Y = np.array(kine.phi(xr,ur).dot(np.concatenate((x_i_g,u_i),axis=0)).reshape((3*Np,1))) + the_c@u[0:2*Nc,:] + kine.psi(xr,ur)
+    E = kine.phi(xr,ur).dot(np.concatenate((x_i_g,u_i),axis=0)).reshape((3*Np,1)) + kine.psi(xr,ur) - Yreff
+    # E = coeff.phi(xr,ur).dot(np.concatenate((x_i,u_i),axis=0)).reshape(3*Np,1) - Yreff # Error term
     # E = Y - the_c@u[0:2*Nc,:] - Yreff
     Ymin = Yreff - tolerance
     #print(Ymin.shape)
@@ -290,10 +318,12 @@ def simulate(initial_state,goal,cars,wheels,distance,Yreff):
             # print('u[2*i,0] + u_old[0]=',u[2*i,0]+u_old[0])
             # print('u[2*i+1,0] + u_old[1]=',u[2*i+1,0]+u_old[1])
             x,phi,midx,midy,vel,omega = pybullet_dynamics.loop(u_old[0]+u[2*i,0],10,u_old[1]+u[2*i+1,0],wheels,cars,distance,Yreff)
-            u_old[0] = u_old[0]+u[2*i,0]
-            u_old[1] = u_old[1]+u[2*i+1,0]
+            # u_old[0] = u_old[0]+u[2*i,0]
+            # u_old[1] = u_old[1]+u[2*i+1,0]
             time += 1./240.
-        state = np.array([(x[0]),(x[1] - 20),phi[2],vel[0],vel[1],omega[2]])
+        velo = np.sqrt(vel[0]**2 + vel[1]**2)
+        # state = np.array([(x[0]),(x[1] - 20),phi[2],vel[0],vel[1],omega[2]])
+        state = np.array([(x[0]),(x[1]),velo,phi[2]])
         # print('state=',state)
         # j+=1
         # print('corresponding Yreff=',Yreff[3*Nc:3*Nc+3])
@@ -313,8 +343,8 @@ def simulate(initial_state,goal,cars,wheels,distance,Yreff):
 
 def main():
     cars,wheels,distance = pybullet_dynamics.sim()
-    initial_state = np.array([0,0,0,0,0,0])
-    goal = np.array([-3,0,0,0,0,0])
+    initial_state = np.array([0,0,0,0])
+    goal = np.array([-3,0,0,0])
     simulate(initial_state,goal,cars,wheels,distance,Yreff)
 
 if __name__ == '__main__':

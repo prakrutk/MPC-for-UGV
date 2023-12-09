@@ -49,8 +49,8 @@ class pybullet_dynamics:
     # car = p.loadURDF("racecar/racecar.urdf", [0, 20, 1],orn)
     car = p.loadURDF("racecar/racecar_differential.urdf",[0,20,1],orn)  #, [0,0,2],useFixedBase=True)
     # box = p.loadURDF("Pybullet/box.urdf", [0, 20, 0.2], orn)  # , [0,0,2],useFixedBase=True)
-    # for i in range(p.getNumJoints(car)):
-      # print(p.getJointInfo(car, i))
+    for i in range(p.getNumJoints(car)):
+      print(p.getJointInfo(car, i))
     # mass = 0
     # for i in range(p.getNumJoints(car)):
     #   mass += p.getDynamicsInfo(car, i)[0]
@@ -191,6 +191,10 @@ class pybullet_dynamics:
     # print('wheel0=',p.getJointState(car, 0)[0])
     # print('wheel2=',p.getJointState(car, 2)[0])
     agent_pos, agent_orn = p.getBasePositionAndOrientation(car)
+    # p.getJointState(car, 8)
+    # print('targetVelocity=',targetVelocity)
+    # print('wheel8=',p.getJointState(car, 8)[1]) 
+    # print('wheel15=',p.getJointState(car, 15)[1])
     # p.resetBasePositionAndOrientation(car, [0, 20, 1], [0, 0, 0, 1])
 
     yaw = p.getEulerFromQuaternion(agent_orn)[-1]
