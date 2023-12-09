@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Define the car model
-Nc = 1# Control Horizon
+Nc = 3# Control Horizon
 Np = 5# Prediction Horizon
 initial_state = np.array([0,0,0,0,0,0,0,0]) # Initial state
 x_i = np.array([1.0,1.0,1.0,1.0,1.0,1.0]) # x,y,theta,xdot,ydot,thetadot
@@ -38,4 +38,4 @@ for i in range (Nc):
 Y,Y1,Y2 = coeff.Y(xr,ur,delu)
 # print('Y1=',Y1)
 # print('Y2=',Y2)
-# print('Y=',Y)
+print('Y=',Y)
