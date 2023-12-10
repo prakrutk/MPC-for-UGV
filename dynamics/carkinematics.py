@@ -69,7 +69,9 @@ class Kinematics(struct.PyTreeNode):
         for i in range(self.Nc):
             for j in range(self.Nc):
                 if j<i:
-                    row[:,2*j:2*j+2] = (D_p.dot(np.power(A_p,(i-j))).dot(B_p))
+                    for k in range(i-j-1):
+                        A_p += np.power(A_p,k+1)
+                    row[:,2*j:2*j+2] = (D_p.dot(A_p)).dot(B_p)
                     # print('i=',i,'j=',j,'row=',row)
                 elif j==i:
                     row[:,2*j:2*j+2] = D_p.dot(B_p)
@@ -109,7 +111,7 @@ class Kinematics(struct.PyTreeNode):
         theta = self.theta(x,u)
         psi = self.psi(x,u)
         # print('phi=',phi)
-        # print('theta=',theta)
+        print('theta=',theta)
         # print('psi=',psi)
         Y1 = phi.dot(np.concatenate((x,u),axis=0))
         Y2 = theta.dot(delu)

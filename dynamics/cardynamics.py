@@ -55,29 +55,36 @@ class dynamics(struct.PyTreeNode):
         alphaf = self.alphaf
         if x[3] == 0:
             alphaf = 0
+            xddot = np.sum((self.m*x[4]*x[5])/self.m)
         else:
-            alphaf = (self.lr + self.lf)*x[5]/x[3] - u[1]
+            # alphaf = (self.lr + self.lf)*x[5]/x[3] - u[1]
+            xddot = np.sum((self.m*x[4]*x[5]-self.cc*((self.lr + self.lf)*x[5]/x[3] - u[1])*u[1])/self.m)
         # xddot = np.sum((self.cl*self.sf-self.cc*alphaf*u[1]+self.cl*self.sr+self.m*x[4]*x[5])/self.m)
-        xddot = np.sum((self.m*x[4]*x[5]-self.cc*alphaf*u[1])/self.m)
+
         return xddot
 
     def f5(self, x, u):
         alphaf = self.alphaf
         if x[3] == 0:
-            alphaf = 0
+            # alphaf = 0
+            yddot = np.sum((-self.m*x[3]*x[5])/self.m)
         else:
-            alphaf = (self.lr + self.lf)*x[5]/x[3] - u[1]
+            # alphaf = (self.lr + self.lf)*x[5]/x[3] - u[1]
+            yddot = np.sum((-self.m*x[3]*x[5]+self.cc*((self.lr + self.lf)*x[5]/x[3] - u[1]))/self.m)
         # yddot = np.sum((self.cc*alphaf+self.cl*self.sf*u[1]+self.cc*alphaf-self.m*x[3]*x[5])/self.m)
-        yddot = np.sum((-self.m*x[3]*x[5]+self.cc*alphaf)/self.m)
+        # yddot = np.sum((-self.m*x[3]*x[5]+self.cc*alphaf)/self.m)
         return yddot
 
     def f6(self, x, u):
         alphaf = self.alphaf
         if x[3] == 0:
             alphaf = 0
+            psiddot = np.sum((self.lf*(self.cl*self.sf*u[1]+self.cc*alphaf)-self.cc*alphaf*self.lr)/self.iz)
         else:
-            alphaf = (self.lr + self.lf)*x[5]/x[3] - u[1]
-        psiddot = np.sum((self.lf*(self.cl*self.sf*u[1]+self.cc*alphaf)-self.cc*alphaf*self.lr)/self.iz)
+            # alphaf = (self.lr + self.lf)*x[5]/x[3] - u[1]
+            psiddot = np.sum((self.cc*((self.lr + self.lf)*x[5]/x[3] - u[1])*(self.lr-self.lf))/self.iz) 
+            # psiddot = np.sum((self.lf*(self.cc*((self.lr + self.lf)*x[5]/x[3] - u[1]))-self.cc*((self.lr + self.lf)*x[5]/x[3] - u[1])*self.lr)/self.iz)
+        # psiddot = np.sum((self.lf*(self.cl*self.sf*u[1]+self.cc*alphaf)-self.cc*alphaf*self.lr)/self.iz)
         return psiddot
     
     def A(self, x, u):
@@ -158,8 +165,10 @@ class dynamics(struct.PyTreeNode):
         for i in range(self.Nc):
             for j in range(self.Nc):
                 if j<i:
+                    for k in range(i-j-1):
+                        A_p += np.power(A_p,k+1)
                     # print(the[3*i:3*i+3,2*j:2*j+2].shape)
-                    row[:,2*j:2*j+2] = C_p.dot(np.power(A_p,(i-j)).dot(B_p))
+                    row[:,2*j:2*j+2] = C_p.dot(A_p).dot(B_p)
                     # print('i=',i,'j=',j,'row=',row)
                 elif j==i:
                     row[:,2*j:2*j+2] = C_p.dot(B_p)
@@ -187,8 +196,9 @@ class dynamics(struct.PyTreeNode):
         # print('inputd=',inputd)
         # print('delu=',delu)
         # print('np.concatenate((stated,inputd),axis=0)=',np.concatenate((stated,inputd),axis=0))
-        Y1 = self.phi(x,u).dot(np.concatenate((stated,inputd),axis=0)).reshape((3*self.Np,1)) 
+        Y1 = self.phi(x,u).dot(np.concatenate((x,u),axis=0)).reshape((3*self.Np,1)) 
         Y2 = self.theta(x,u).dot(delu)
+        print(self.theta(x,u))
         Y2 = np.append(Y2,np.zeros(((Y1.shape[0] - Y2.shape[0]),1)),axis=0)
         Y = Y1 + Y2
         return Y,Y1,Y2

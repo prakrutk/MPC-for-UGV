@@ -29,5 +29,5 @@ for i in range (Nc):
 Y,Y1,Y2,psi = coeff.Y(xr,ur,delu)
 # print('Y1=',Y1)
 # print('Y2=',Y2)
-print('Y=',Y)
+# print('Y=',Y)
 # print('psi=',psi)

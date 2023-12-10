@@ -176,7 +176,7 @@ class pybullet_dynamics:
 
     # print(steeringAngle)
     for steer in steering:
-      p.setJointMotorControl2(car, steer, p.POSITION_CONTROL, targetPosition=steeringAngle)
+      p.setJointMotorControl2(car, steer, p.POSITION_CONTROL, targetPosition=-steeringAngle)
     # p.setJointMotorControl2(car, 0, p.POSITION_CONTROL, targetPosition=steeringAngle)
     # p.setJointMotorControl2(car, 2, p.POSITION_CONTROL, targetPosition=steeringAngle)
     # p.setJointMotorControl2(car, 2, p.POSITION_CONTROL, targetPosition=steeringAngle)

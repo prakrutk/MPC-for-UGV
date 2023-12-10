@@ -3,12 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Define the car model
-Nc = 10# Control Horizon
-Np = 20# Prediction Horizon
+Nc = 3# Control Horizon
+Np = 5# Prediction Horizon
 initial_state = np.array([0,0,0,0,0,0,0,0]) # Initial state
-x_i = np.array([0.0,0.0,0.0,1.0,1.0,1.0]) # x,y,theta,xdot,ydot,thetadot
+x_i = np.array([0.0,0.0,0.0,0.0,0.0,0.0]) # x,y,theta,xdot,ydot,thetadot
 u_i = np.array([0.0,0.0]) # v,omega
-xr = np.array([0.0,0.0,0.0,0.0,0.0,0.0]) # Reference state
+xr = np.array([0.0,0.0,0.0,1.0,0.0,0.0]) # Reference state
 ur = np.array([0.0,0.0]) # Reference input
 delu = 0.0*np.ones((2*Nc,1)) # Input rate of change
 Yreff = 0.0*np.ones((3*Np,1)) # Reference output
@@ -24,7 +24,7 @@ coeff = dynamics(state = x_i
                 ,sr = 0.0
                 ,m = 6.38
                 ,alphaf = 0
-                ,lf = 0.1
+                ,lf = 0.09
                 ,lr = 0.1
                 ,iz = 0.058
                 ,T = 1./240.
@@ -35,7 +35,7 @@ for i in range (Nc):
     delu[2*i]=0.1
     delu[2*i+1]=0.1
 
-Y,Y1,Y2 = coeff.Y(xr,ur,delu)
+Y,Y1,Y2 = coeff.Y((x_i-xr),u_i,delu)
 # print('Y1=',Y1)
 # print('Y2=',Y2)
-print('Y=',Y)
+# print('Y=',Y)
