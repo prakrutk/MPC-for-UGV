@@ -121,8 +121,8 @@ class Segment():
         bl = (0, 480)
         tr = (550, 387)
         br = (640, 480)
-        # midx = np.zeros(10)
-        # midy = np.zeros(10)
+        midx = np.zeros(6)
+        midy = np.zeros(6)
         pts1 = np.float32([tl, bl, tr, br])
         pts2 = np.float32([[0, 0], [0, 480], [640, 0], [640, 480]])
         frame = Image.fromarray(frame)
@@ -153,11 +153,14 @@ class Segment():
         # print(centroid)
         conversion_factory = 1./640.
         conversion_factorx = 1./480.
-        if centroid:
-            midy = (320-centroid[0])  * conversion_factory
-            midx = (centroid[1]) * conversion_factorx
+        for i in range(6):
+            if centroid:
+                midy[i] = (i+1)*(320-centroid[0])  * conversion_factory
+                midx[i] = (i+1)*(centroid[1]) * conversion_factorx
             # midp = np.array([midx,midy])
-            return midx,midy
-        else:
-            return None,None
+                # print(i)
+            else:
+                midx[i] = 0.1*(i+1)
+                midy[i] = 0.1*(i+1)
+        return midx,midy
 

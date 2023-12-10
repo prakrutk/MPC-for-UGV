@@ -7,8 +7,8 @@ from scipy.interpolate import CubicSpline
 from math import sin, cos, tan, atan2, sqrt, pi
 from dynamics.carkinematics import Kinematics
 
-Nc = 3# Control Horizon
-Np = 5# Prediction Horizon
+Nc = 5# Control Horizon
+Np = 10# Prediction Horizon
 initial_state = np.array([0,0,0,0,0,0,0,0]) # Initial state
 x_i = np.array([0.0,0.0,0.0,0.0,0.0,0.0]) # x,y,theta,xdot,ydot,thetadot
 # initial_state = np.array([0,0,0,0,0,0]) # Initial state
@@ -19,7 +19,7 @@ xr = np.array([0.0,0.0,0.0,0.0,0.0,0.0]) # Reference state
 ur = np.array([0.0,0.0]) # Reference input
 delu = 0.0*np.ones((2*Nc,1)) # Input rate of change
 Yreff = 0.0*np.ones((3*Np,1)) # Reference output
-Q = 100*np.identity(3*Np) # Weight matrix output
+Q = 100*np.identity(3) # Weight matrix output
 # R = np.zeros((2*Nc,2*Nc)) # Weight matrix input
 #diag = np.array([0.1,100])
 #for i in range(Nc-1): 
@@ -32,6 +32,7 @@ for i in range(Nc):
     R[2*i+1,2*i+0]=0
     R[2*i+1,2*i+1]=100# Weight matrix input
 # print(R)
+R = np.array([[0.1,0.0],[0.0,100]])
 tolerance = 0.01*np.ones((3*Np,1)) # Tolerance
 Ymax = Yreff + tolerance # Maximum output
 Ymin = Yreff - tolerance # Minimum output
@@ -224,14 +225,14 @@ def linearmpc(x_i,u_i,xr,t,midx,midy,Yreff):
     cost = 0.0
     constraints = []
     # print(midx)
-    # if t <= 100/240:
-        # for i in range(Np):
+    if t <= 100/240:
+        for i in range(Np):
         # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(spline(i+1,x_i,x_i[0]+midx,x_i[1]+midy))
         # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(reff(i+1,x_i,x_i[0]+midx,x_i[1]+midy))
         # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(cubicspline(i,xr[0],xr[1],x_i[0]+midx,x_i[1]+midy))
-    Yreff = cubicspline(xr,x_i,midx,midy)
+    # Yreff = cubicspline(xr,x_i,midx,midy)
     # print('Yreff=',Yreff)
-            # Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(trajectory(i,xr))
+            Yreff[3*i,0],Yreff[3*i+1,0],Yreff[3*i+2,0] = np.array(trajectory(i,xr))
     # print('Yreff=',Yreff)
     # the_c=np.concatenate((kine.theta(xr,ur),np.zeros((3*(Np-Nc),2*Nc))),axis=0)
     # H = np.transpose(the_c).dot(Q).dot(the_c) + R 
@@ -301,6 +302,48 @@ def linearmpc(x_i,u_i,xr,t,midx,midy,Yreff):
     #print('del_u=',u.value)
     return u.value,u_i,Yreff
 
+def MPC(x_i,u_i,xr,t,midx,midy,Yreff):
+    dist = 100.0
+    for i in range(Np):
+        distn = nearest_index(x_i[0],x_i[1],Yreff[3*i],Yreff[3*i+1])
+        if distn < dist:
+            dist = distn
+            index = i
+    # xr = np.concatenate(Yreff[3*index:3*index+2],np.array([0.0,0.0,0.0]))
+
+    ur[0] = xr[3]  
+    u = cvx.Variable((2,1))
+    x_next = cvx.Variable((6,1))
+    # Y = cvx.Variable((3*Np,1))
+    usc = 0.0
+    uvc = 0.0
+    x_next = x_i
+    cost = 0.0
+    constraints = []
+    for i in range(Np):
+        xr[0] = Yreff[3*i]
+        xr[1] = Yreff[3*i+1]
+        xr[2] = Yreff[3*i+2]
+        xr[3] = (Yreff[3*i+3] - Yreff[3*i])*240
+        xr[4] = (Yreff[3*i+4] - Yreff[3*i+1])*240
+        xr[5] = (Yreff[3*i+5] - Yreff[3*i+2])*240
+        xr = xr.reshape(6,1)
+        x_next = coeff.eqn(x_next,u)
+        cost += cvx.quad_form(x_next-xr,Q) + cvx.quad_form(u,R)
+        constraints += [u[2*i,:] <= 0.5]
+        constraints += [u[2*i,:] >= -0.5]
+        constraints += [u[2*i+1,:] <= 0.05]
+        constraints += [u[2*i+1,:] >= -0.05]
+    
+    prob = cvx.Problem(cvx.Minimize(cost), constraints) # Optimization problem initialization
+    prob.solve(solver=cvx.ECOS,verbose=False) # Solver
+    return u.value,u_i,Yreff
+
+
+
+    # Y = cvx.Variable((3*Np,1))
+    # E = cvx.Parameter((3*N
+
 # def check_waypoint(state,midx,midy):
 #     if abs(state[0] - midx) < 0.05 and abs(state[1] - midy) <0.05:
 #         return True
@@ -322,7 +365,8 @@ def simulate(initial_state,goal,cars,wheels,distance,Yreff):
     u_t = np.array([0.0,0.0])
     x,phi,midx,midy,vel,omega = pybullet_dynamics.loop(0,10,0,wheels,cars,distance,Yreff)
     while MAX_TIME >= time:
-        u, u_old,Yreff = linearmpc(state,u_t,xr,time,midx,midy,Yreff)
+        # u, u_old,Yreff = linearmpc(state,u_t,xr,time,midx,midy,Yreff)
+        u, u_old,Yreff = MPC(state,u_t,xr,time,midx,midy,Yreff)
         for i in range(Nc):
             # x,phi = pyconnect(2*u[2*i,0],u[2*i+1,0],wheels,car,useRealTimeSim)
             # print('u[2*i,0] + u_old[0]=',u[2*i,0]+u_old[0])

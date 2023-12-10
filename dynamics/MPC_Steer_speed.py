@@ -8,6 +8,8 @@ import pybullet as p
 import time
 import pybullet_data
 sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
+from Waypoint_generation.segment import Segment
+import cv2
 
 import cubic_spline_planner
 
@@ -21,7 +23,7 @@ Rd = np.diag([0.01, 1.0])  # input difference cost matrix
 Q = np.diag([1.0, 1.0, 0.5, 0.5])  # state cost matrix
 Qf = Q  # state final matrix
 GOAL_DIS = 1.5  # goal distance
-STOP_SPEED = 0.5 / 3.6  # stop speed
+STOP_SPEED = 2.5 / 3.6  # stop speed
 MAX_TIME = 500.0  # max simulation time
 
 # iterative paramter
@@ -34,16 +36,16 @@ N_IND_SEARCH = 10  # Search index number
 DT = 0.2  # [s] time tick
 
 # Vehicle parameters
-LENGTH = 4.5  # [m]
-WIDTH = 2.0  # [m]
-BACKTOWHEEL = 1.0  # [m]
-WHEEL_LEN = 0.3  # [m]
-WHEEL_WIDTH = 0.2  # [m]
-TREAD = 0.7  # [m]
-WB = 2.5  # [m]
+LENGTH = 0.1  # [m]
+WIDTH = 0.05  # [m]
+BACKTOWHEEL = 0.1  # [m]
+WHEEL_LEN = 0.03  # [m]
+WHEEL_WIDTH = 0.02  # [m]
+TREAD = 0.01  # [m]
+WB = 0.1  # [m]
 
-MAX_STEER = np.deg2rad(45.0)  # maximum steering angle [rad]
-MAX_DSTEER = np.deg2rad(30.0)  # maximum steering speed [rad/s]
+MAX_STEER = np.deg2rad(10.0)  # maximum steering angle [rad]
+MAX_DSTEER = np.deg2rad(1.0)  # maximum steering speed [rad/s]
 MAX_SPEED = 55.0 / 3.6  # maximum speed [m/s]
 MIN_SPEED = -20.0 / 3.6  # minimum speed [m/s]
 MAX_ACCEL = 1.0  # maximum accel [m/ss]
@@ -155,25 +157,31 @@ def plot_car(x, y, yaw, steer=0.0, cabcolor="-r", truckcolor="-k"):  # pragma: n
     plt.plot(x, y, "*")
 
 
-def update_state(state, a, delta):
+def update_state(state, a, delta,car,wheels,useRealTimeSim):
 
     # input check
     if delta >= MAX_STEER:
         delta = MAX_STEER
     elif delta <= -MAX_STEER:
         delta = -MAX_STEER
-
-    state.x = state.x + state.v * math.cos(state.yaw) * DT
-    state.y = state.y + state.v * math.sin(state.yaw) * DT
-    state.yaw = state.yaw + state.v / WB * math.tan(delta) * DT
+    
+    agent_pos, agent_orn,midx,midy = pyconnect(state.v,delta,wheels,car,useRealTimeSim)
+    state.x = agent_pos[0]
+    state.y = agent_pos[1] - 20
+    state.yaw = p.getEulerFromQuaternion(agent_orn)[-1]
     state.v = state.v + a * DT
+
+    # state.x = state.x + state.v * math.cos(state.yaw) * DT
+    # state.y = state.y + state.v * math.sin(state.yaw) * DT
+    # state.yaw = state.yaw + state.v / WB * math.tan(delta) * DT
+    # state.v = state.v + a * DT
 
     if state.v > MAX_SPEED:
         state.v = MAX_SPEED
     elif state.v < MIN_SPEED:
         state.v = MIN_SPEED
 
-    return state
+    return state, midx, midy
 
 
 def get_nparray_from_matrix(x):
@@ -203,14 +211,14 @@ def calc_nearest_index(state, cx, cy, cyaw, pind):
     return ind, mind
 
 
-def predict_motion(x0, oa, od, xref):
+def predict_motion(x0, oa, od, xref,car,wheels,useRealTimeSim):
     xbar = xref * 0.0
     for i, _ in enumerate(x0):
         xbar[i, 0] = x0[i]
 
     state = State(x=x0[0], y=x0[1], yaw=x0[3], v=x0[2])
     for (ai, di, i) in zip(oa, od, range(1, T + 1)):
-        state = update_state(state, ai, di)
+        state, midx, midy = update_state(state, ai, di,car,wheels,useRealTimeSim)
         xbar[0, i] = state.x
         xbar[1, i] = state.y
         xbar[2, i] = state.v
@@ -219,7 +227,7 @@ def predict_motion(x0, oa, od, xref):
     return xbar
 
 
-def iterative_linear_mpc_control(xref, x0, dref, oa, od):
+def iterative_linear_mpc_control(xref, x0, dref, oa, od,car,wheels,useRealTimeSim):
     """
     MPC control with updating operational point iteratively
     """
@@ -230,7 +238,7 @@ def iterative_linear_mpc_control(xref, x0, dref, oa, od):
         od = [0.0] * T
 
     for i in range(MAX_ITER):
-        xbar = predict_motion(x0, oa, od, xref)
+        xbar = predict_motion(x0, oa, od, xref,car,wheels,useRealTimeSim)
         poa, pod = oa[:], od[:]
         oa, od, ox, oy, oyaw, ov = linear_mpc_control(xref, xbar, x0, dref)
         du = sum(abs(oa - poa)) + sum(abs(od - pod))  # calc u change value
@@ -374,37 +382,43 @@ def pyconnect(v,d,wheels,car,useRealTimeSim):
                                 force=maxForce)
 
     for steer in steering:
-        p.setJointMotorControl2(car, steer, p.POSITION_CONTROL, targetPosition=-steeringAngle)
+        p.setJointMotorControl2(car, steer, p.POSITION_CONTROL, targetPosition=steeringAngle)
         agent_pos, agent_orn =p.getBasePositionAndOrientation(car)
 
         yaw = p.getEulerFromQuaternion(agent_orn)[-1]
-        xA, yA, zA = agent_pos
-        zA = zA + 0.3 # make the camera a little higher than the robot
+    xA, yA, zA = agent_pos
+    zA = zA + 0.3 # make the camera a little higher than the robot
 
-        # compute focusing point of the camera
-        xB = xA + math.cos(yaw) * distance
-        yB = yA + math.sin(yaw) * distance
-        zB = zA
+    # compute focusing point of the camera
+    xB = xA + math.cos(yaw) * distance
+    yB = yA + math.sin(yaw) * distance
+    zB = zA
 
-        view_matrix = p.computeViewMatrix(
-                            cameraEyePosition=[xA, yA, zA],
-                            cameraTargetPosition=[xB, yB, zB],
-                            cameraUpVector=[0, 0, 1.0]
-                        )
+    view_matrix = p.computeViewMatrix(
+                        cameraEyePosition=[xA, yA, zA],
+                        cameraTargetPosition=[xB, yB, zB],
+                        cameraUpVector=[0, 0, 1.0]
+                    )
 
-        projection_matrix = p.computeProjectionMatrixFOV(
-                                fov=90, aspect=1.5, nearVal=0.02, farVal=3.5)
+    projection_matrix = p.computeProjectionMatrixFOV(
+                            fov=90, aspect=1.5, nearVal=0.02, farVal=3.5)
 
-        imgs = p.getCameraImage(img_w, img_h,
-                                view_matrix,
-                                projection_matrix, shadow=True,
-                                renderer=p.ER_BULLET_HARDWARE_OPENGL)
+    imgs = p.getCameraImage(img_w, img_h,
+                            view_matrix,
+                            projection_matrix, shadow=True,
+                            renderer=p.ER_BULLET_HARDWARE_OPENGL)
+    frame = cv2.resize(imgs[2], (640, 480))
+
+    midpoint = Segment()
+    midx,midy = midpoint.read_video(frame)
     steering
+
     if (useRealTimeSim == 0):
         p.stepSimulation()
     time.sleep(0.01)
+    return agent_pos, agent_orn,midx,midy
 
-def do_simulation(cx, cy, cyaw, ck, sp, dl, initial_state):
+def do_simulation(cx, cy, cyaw, ck, sp, dl, initial_state,car,wheels,useRealTimeSim):
     """
     Simulation
 
@@ -416,8 +430,8 @@ def do_simulation(cx, cy, cyaw, ck, sp, dl, initial_state):
     dl: course tick [m]
 
     """
-
-    goal = [cx[-1], cy[-1]]
+    
+    goal = [5, 0]
 
     state = initial_state
 
@@ -435,110 +449,14 @@ def do_simulation(cx, cy, cyaw, ck, sp, dl, initial_state):
     t = [0.0]
     d = [0.0]
     a = [0.0]
+    pos,orn,midx,midy = pyconnect(0,0,wheels,car,useRealTimeSim)
+    cx,cy,cyaw,ck = generatetraj(midx,midy,dl)
     target_ind, _ = calc_nearest_index(state, cx, cy, cyaw, 0)
 
     odelta, oa = None, None
 
     cyaw = smooth_yaw(cyaw)
-    cid = p.connect(p.SHARED_MEMORY)
-    if (cid < 0):
-        p.connect(p.GUI)
-    p.setAdditionalSearchPath(pybullet_data.getDataPath())
-    p.resetSimulation()
-    p.setGravity(0, 0, -10)
-    useRealTimeSim = 1
-    p.setRealTimeSimulation(useRealTimeSim) 
-
-
-    p.loadURDF("plane.urdf")
-    car = p.loadURDF("racecar/racecar_differential.urdf",[-4,4,1])
-    for i in range(100):
-        p.stepSimulation()
-    for i in range(p.getNumJoints(car)):
-        print(p.getJointInfo(car, i))
-    for wheel in range(p.getNumJoints(car)):
-        p.setJointMotorControl2(car, wheel, p.VELOCITY_CONTROL, targetVelocity=0, force=0)
-        p.getJointInfo(car, wheel)
-    wheels = [8, 15]
-    c = p.createConstraint(car,
-                        9,
-                        car,
-                        11,
-                        jointType=p.JOINT_GEAR,
-                        jointAxis=[0, 1, 0],
-                        parentFramePosition=[0, 0, 0],
-                        childFramePosition=[0, 0, 0])
-    p.changeConstraint(c, gearRatio=1, maxForce=10000)
-
-    c = p.createConstraint(car,
-                        10,
-                        car,
-                        13,
-                        jointType=p.JOINT_GEAR,
-                        jointAxis=[0, 1, 0],
-                        parentFramePosition=[0, 0, 0],
-                        childFramePosition=[0, 0, 0])
-    p.changeConstraint(c, gearRatio=-1, maxForce=10000)
-
-    c = p.createConstraint(car,
-                        9,
-                        car,
-                        13,
-                        jointType=p.JOINT_GEAR,
-                        jointAxis=[0, 1, 0],
-                        parentFramePosition=[0, 0, 0],
-                        childFramePosition=[0, 0, 0])
-    p.changeConstraint(c, gearRatio=-1, maxForce=10000)
-
-    c = p.createConstraint(car,
-                        16,
-                        car,
-                        18,
-                        jointType=p.JOINT_GEAR,
-                        jointAxis=[0, 1, 0],
-                        parentFramePosition=[0, 0, 0],
-                        childFramePosition=[0, 0, 0])
-    p.changeConstraint(c, gearRatio=1, maxForce=10000)
-
-    c = p.createConstraint(car,
-                        16,
-                        car,
-                        19,
-                        jointType=p.JOINT_GEAR,
-                        jointAxis=[0, 1, 0],
-                        parentFramePosition=[0, 0, 0],
-                        childFramePosition=[0, 0, 0])
-    p.changeConstraint(c, gearRatio=-1, maxForce=10000)
-
-    c = p.createConstraint(car,
-                        17,
-                        car,
-                        19,
-                        jointType=p.JOINT_GEAR,
-                        jointAxis=[0, 1, 0],
-                        parentFramePosition=[0, 0, 0],
-                        childFramePosition=[0, 0, 0])
-    p.changeConstraint(c, gearRatio=-1, maxForce=10000)
-
-    c = p.createConstraint(car,
-                        1,
-                        car,
-                        18,
-                        jointType=p.JOINT_GEAR,
-                        jointAxis=[0, 1, 0],
-                        parentFramePosition=[0, 0, 0],
-                        childFramePosition=[0, 0, 0])
-    p.changeConstraint(c, gearRatio=-1, gearAuxLink=15, maxForce=10000)
-    c = p.createConstraint(car,
-                        3,
-                        car,
-                        19,
-                        jointType=p.JOINT_GEAR,
-                        jointAxis=[0, 1, 0],
-                        parentFramePosition=[0, 0, 0],
-                        childFramePosition=[0, 0, 0])
-    p.changeConstraint(c, gearRatio=-1, gearAuxLink=15, maxForce=10000)
-
+    
     while MAX_TIME >= time:
         xref, target_ind, dref = calc_ref_trajectory(
             state, cx, cy, cyaw, ck, sp, dl, target_ind)
@@ -546,12 +464,12 @@ def do_simulation(cx, cy, cyaw, ck, sp, dl, initial_state):
         x0 = [state.x, state.y, state.v, state.yaw]  # current state
 
         oa, odelta, ox, oy, oyaw, ov = iterative_linear_mpc_control(
-            xref, x0, dref, oa, odelta)
+            xref, x0, dref, oa, odelta,car,wheels,useRealTimeSim)
 
         di, ai = 0.0, 0.0
         if odelta is not None:
             di, ai = odelta[0], oa[0]
-            state = update_state(state, ai, di)
+            state, midx, midy = update_state(state, ai, di, car,wheels,useRealTimeSim)
 
         time = time + DT
 
@@ -563,8 +481,18 @@ def do_simulation(cx, cy, cyaw, ck, sp, dl, initial_state):
         d.append(di)
         a.append(ai)
 
-        pyconnect(state.v,di,wheels,car,useRealTimeSim)
+        for i in range(midx.shape[0]):
+            midx[i] = state.x + midx[i]
+            midy[i] = state.y + midy[i]
 
+        cx1,cy1,cyaw1,ck1 = generatetraj(midx,midy,dl) 
+        sp1 = calc_speed_profile(cx1, cy1, cyaw1, TARGET_SPEED)
+        cx.extend(cx1)
+        cy.extend(cy1)
+        cyaw.extend(cyaw1)
+        ck.extend(ck1)
+        sp.extend(sp1)
+        
         if check_goal(state, goal, target_ind, len(cx)):
             print("Goal")
             break
@@ -666,8 +594,8 @@ def get_straight_course3(dl):
 
 
 def get_forward_course(dl):
-    ax = [0.0, 60.0, 125.0, 50.0, 75.0, 30.0, -10.0]
-    ay = [0.0, 0.0, 50.0, 65.0, 30.0, 50.0, -20.0]
+    ax = [0.0, 8.0, 10.0, 12.0, 17.0, 20.0, 22.0]
+    ay = [0.0, 0.0, 7.0, 9.0, 6.0, 4.0, 2.0]
     cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
         ax, ay, ds=dl)
 
@@ -691,6 +619,14 @@ def get_switch_back_course(dl):
 
     return cx, cy, cyaw, ck
 
+def generatetraj(midx,midy,dl):
+    ax = midx
+    ay = midy
+    # print(midx)
+    # print(midy)
+    cx,cy,cyaw,ck,s = cubic_spline_planner.calc_spline_course(ax,ay,ds=dl)
+    return cx,cy,cyaw,ck
+
 
 def main():
     print(__file__ + " start!!")
@@ -706,8 +642,110 @@ def main():
 
     initial_state = State(x=cx[0], y=cy[0], yaw=cyaw[0], v=0.0)
 
+    cid = p.connect(p.SHARED_MEMORY)
+    if (cid < 0):
+        p.connect(p.GUI)
+    p.setAdditionalSearchPath(pybullet_data.getDataPath())
+    p.resetSimulation()
+    p.setGravity(0, 0, -10)
+    useRealTimeSim = 1
+    p.setRealTimeSimulation(useRealTimeSim) 
+
+
+    # p.loadURDF("plane.urdf")
+
+    p.loadSDF("stadium.sdf")
+    car = p.loadURDF("racecar/racecar_differential.urdf",[0,20,1])
+    for i in range(100):
+        p.stepSimulation()
+    for i in range(p.getNumJoints(car)):
+        print(p.getJointInfo(car, i))
+    for wheel in range(p.getNumJoints(car)):
+        p.setJointMotorControl2(car, wheel, p.VELOCITY_CONTROL, targetVelocity=0, force=0)
+        p.getJointInfo(car, wheel)
+    wheels = [8, 15]
+    c = p.createConstraint(car,
+                        9,
+                        car,
+                        11,
+                        jointType=p.JOINT_GEAR,
+                        jointAxis=[0, 1, 0],
+                        parentFramePosition=[0, 0, 0],
+                        childFramePosition=[0, 0, 0])
+    p.changeConstraint(c, gearRatio=1, maxForce=10000)
+
+    c = p.createConstraint(car,
+                        10,
+                        car,
+                        13,
+                        jointType=p.JOINT_GEAR,
+                        jointAxis=[0, 1, 0],
+                        parentFramePosition=[0, 0, 0],
+                        childFramePosition=[0, 0, 0])
+    p.changeConstraint(c, gearRatio=-1, maxForce=10000)
+
+    c = p.createConstraint(car,
+                        9,
+                        car,
+                        13,
+                        jointType=p.JOINT_GEAR,
+                        jointAxis=[0, 1, 0],
+                        parentFramePosition=[0, 0, 0],
+                        childFramePosition=[0, 0, 0])
+    p.changeConstraint(c, gearRatio=-1, maxForce=10000)
+
+    c = p.createConstraint(car,
+                        16,
+                        car,
+                        18,
+                        jointType=p.JOINT_GEAR,
+                        jointAxis=[0, 1, 0],
+                        parentFramePosition=[0, 0, 0],
+                        childFramePosition=[0, 0, 0])
+    p.changeConstraint(c, gearRatio=1, maxForce=10000)
+
+    c = p.createConstraint(car,
+                        16,
+                        car,
+                        19,
+                        jointType=p.JOINT_GEAR,
+                        jointAxis=[0, 1, 0],
+                        parentFramePosition=[0, 0, 0],
+                        childFramePosition=[0, 0, 0])
+    p.changeConstraint(c, gearRatio=-1, maxForce=10000)
+
+    c = p.createConstraint(car,
+                        17,
+                        car,
+                        19,
+                        jointType=p.JOINT_GEAR,
+                        jointAxis=[0, 1, 0],
+                        parentFramePosition=[0, 0, 0],
+                        childFramePosition=[0, 0, 0])
+    p.changeConstraint(c, gearRatio=-1, maxForce=10000)
+
+    c = p.createConstraint(car,
+                        1,
+                        car,
+                        18,
+                        jointType=p.JOINT_GEAR,
+                        jointAxis=[0, 1, 0],
+                        parentFramePosition=[0, 0, 0],
+                        childFramePosition=[0, 0, 0])
+    p.changeConstraint(c, gearRatio=-1, gearAuxLink=15, maxForce=10000)
+    c = p.createConstraint(car,
+                        3,
+                        car,
+                        19,
+                        jointType=p.JOINT_GEAR,
+                        jointAxis=[0, 1, 0],
+                        parentFramePosition=[0, 0, 0],
+                        childFramePosition=[0, 0, 0])
+    p.changeConstraint(c, gearRatio=-1, gearAuxLink=15, maxForce=10000)
+
+
     t, x, y, yaw, v, d, a = do_simulation(
-        cx, cy, cyaw, ck, sp, dl, initial_state)
+        cx, cy, cyaw, ck, sp, dl, initial_state,car,wheels,useRealTimeSim)
 
     if show_animation:  # pragma: no cover
         plt.close("all")

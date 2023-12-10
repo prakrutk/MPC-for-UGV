@@ -26,7 +26,7 @@ class dynamics(struct.PyTreeNode):
     Np: int
     
     def f1(self, x, u):
-        xdot = np.sum(u[0])
+        xdot = np.sum(x[3])
         return xdot
 
     def f2(self, x, u):
@@ -55,10 +55,10 @@ class dynamics(struct.PyTreeNode):
         alphaf = self.alphaf
         if x[3] == 0:
             alphaf = 0
-            xddot = np.sum((self.m*x[4]*x[5])/self.m)
+            xddot = np.sum((self.m*x[4]*x[5])/self.m + u[0]*self.T)
         else:
             # alphaf = (self.lr + self.lf)*x[5]/x[3] - u[1]
-            xddot = np.sum((self.m*x[4]*x[5]-self.cc*((self.lr + self.lf)*x[5]/x[3] - u[1])*u[1])/self.m)
+            xddot = np.sum((self.m*x[4]*x[5]-self.cc*((self.lr + self.lf)*x[5]/x[3] - u[1])*u[1])/self.m + u[0]*self.T)
         # xddot = np.sum((self.cl*self.sf-self.cc*alphaf*u[1]+self.cl*self.sr+self.m*x[4]*x[5])/self.m)
 
         return xddot
@@ -133,7 +133,11 @@ class dynamics(struct.PyTreeNode):
     def eqn(self, x, u):
         xr = self.stater
         ur = self.inputr
-        return self.A(xr, ur)*(x -xr) + self.B(xr, ur)*(u - ur)
+        ur = ur.reshape((2,1))
+        # print(self.A(xr, ur).dot(x-xr))
+        print(self.B(xr, ur).dot(u - ur))
+        # print(self.A(xr, ur).dot(x-xr) + self.B(xr, ur).dot(u - ur))
+        return self.A(xr, ur).dot(x -xr) + self.B(xr, ur).dot(u - ur)
 
     def C(self, x, u):
         C = np.array([[1.0,0.0,0.0],[0.0,1.0,0.0],[0.0,0.0,1.0]])
@@ -163,10 +167,26 @@ class dynamics(struct.PyTreeNode):
         # print('C_p*A_p*B_p=',C_p.dot(A_p).dot(B_p))
         row = np.zeros((3,self.Nc*2))
         for i in range(self.Nc):
+            if i ==0:
+                for j in range(self.Nc):
+                    if j<i:
+                        for k in range(i-j-1):
+                            A_p += np.power(A_p,k+1)
+                            # print('i=',i,'j=',j,'A_p=',A_p)
+                    # print(the[3*i:3*i+3,2*j:2*j+2].shape)
+                        the[:,2*j:2*j+2] = C_p.dot(A_p).dot(B_p)
+                        # print('i=',i,'j=',j,'row=',row)
+                    elif j==i:
+                        the[:,2*j:2*j+2] = C_p.dot(B_p)
+                    else:
+                        the[:,2*j:2*j+2] = np.zeros((3,2))
+                        # print(the)
+
             for j in range(self.Nc):
                 if j<i:
                     for k in range(i-j-1):
                         A_p += np.power(A_p,k+1)
+                        # print('i=',i,'j=',j,'k=',k,'A_p=',A_p)
                     # print(the[3*i:3*i+3,2*j:2*j+2].shape)
                     row[:,2*j:2*j+2] = C_p.dot(A_p).dot(B_p)
                     # print('i=',i,'j=',j,'row=',row)
@@ -174,9 +194,7 @@ class dynamics(struct.PyTreeNode):
                     row[:,2*j:2*j+2] = C_p.dot(B_p)
                 else:
                     row[:,2*j:2*j+2] = np.zeros((3,2))
-            # print('i=',i,'row=',row)
-            if i==0:
-                the = row
+                    # print('i=',i,'row=',row)
                 # print(i)
                 # print('i=',i,'the=',the)
             else: 
@@ -186,7 +204,6 @@ class dynamics(struct.PyTreeNode):
         # the = np.flip(the,axis=1)
 
         # print('the=',the)
-        
         return the
     
     def Y(self,x,u,delu):
