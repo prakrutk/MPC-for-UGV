@@ -60,7 +60,7 @@ $$I_z\ddot \psi = l_f(f_{f_x}sin\delta + f_{f_y}cos\delta) - f_{r_y}l_r$$
 $C_l$ is the cornering stiffness of the tire. \
 $s_f$ is the slip ratio of the front wheel. \
 $s_r$ is the slip ratio of the rear wheel. \
-$c_l$ is the longitudinal stiffness of the tire. \
+$C_c$ is the longitudinal stiffness of the tire. \
 $\alpha_f$ is the slip angle of the front wheel. \
 $\alpha_r$ is the slip angle of the rear wheel. 
 
