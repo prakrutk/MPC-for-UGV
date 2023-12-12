@@ -33,15 +33,15 @@ Model Predictive Control(MPC) for trajectory tracking on Unmanned Ground Vehicle
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Model.png)
 
 ##### Notations:
-State variable: $ X = (x,y,\psi , \dot x, \dot y, \dot \psi  )$
+State variable: $ X = (X,Y,\psi , \dot x, \dot y, \dot \psi  )$
 
 Input/control variable: $U = (\delta, V )$
 
 Where, \
-$x,y$ are coordinates of the COM of the car in world frame. \
+$X, Y$ are coordinates of the COM of the car in the world frame. \
 $\psi$ is the heading angle of the car. \
 $\delta$ is the steering angle of the car. \
-$\omega$ is the rotational speed of both the wheels.
+$V$ is the COM velocity of the car.
 
 $f_{f_x} ,f_{f_y} ,f_{r_x} ,f_{r_y}$ are the force acting in the body frame of front and rear wheel of the car respectively. 
 
@@ -81,6 +81,9 @@ $$I_z\ddot \psi = l_f(C_ls_f\delta + C_c\alpha_f) - c_c\alpha_rl_r $$
 Also,
 
 $$ \dot y = \dot x(\alpha_f + \delta) - l_f\dot \psi$$
+
+$$ \dot X = \dot xcos(\psi) - \dot ysin(\psi) $$
+$$ \dot Y = \dot xsin(\psi) + \dot ycos(\psi) $$
 
 #### MPC Formulation:
 
