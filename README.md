@@ -83,6 +83,7 @@ Also,
 $$ \dot y = \dot x(\alpha_f + \delta) - l_f\dot \psi$$
 
 $$ \dot X = \dot xcos(\psi) - \dot ysin(\psi) $$
+
 $$ \dot Y = \dot xsin(\psi) + \dot ycos(\psi) $$
 
 #### MPC Formulation:
