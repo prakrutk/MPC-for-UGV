@@ -12,7 +12,7 @@
 10. Autonomous racing using model predictive control [[paper]](http://www.diva-portal.org/smash/get/diva2:1182133/FULLTEXT01.pdf)
 11. RC Car Modelling and Trajectory Tracking Control [[github]](https://github.com/Arttrm/MW_EiI_208_Trajectory_Planning_and_Tracking)
 12. Robust Learning Model-Predictive Control for Linear Systems Performing Iterative Tasks [[paper]](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9440698)
-13. Autonomous Racing with Multiple Vehicles using a Parallelized Optimization with Safety Guarantee using Control Barrier Functions [[Paper]](https://arxiv.org/pdf/2112.06435.pdf)
+13. Autonomous Racing with Multiple Vehicles using a Parallelized Optimization with Safety Guarantee using Control Barrier Functions [[Paper]](https://arxiv.org/pdf/2112.06435.pdf) [[code]](https://github.com/HybridRobotics/car-racing)
 14. 
 
 ### Path planning:
