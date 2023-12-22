@@ -117,9 +117,9 @@ class Segment():
         # cv2.imshow('frame',frame)
         # cv2.waitKey(100000)
         # Find the centroid of the surface in the current frame
-        tl = (80, 387)
+        tl = (150, 300)
         bl = (0, 480)
-        tr = (550, 387)
+        tr = (490, 300)
         br = (640, 480)
         midx = np.zeros(6)
         midy = np.zeros(6)
@@ -150,9 +150,12 @@ class Segment():
         # cv2.imshow('im',im)
         # cv2.waitKey(100000)
         centroid = self.find_surface_centroid(im)
+        # cv2.circle(transformed_frame, (centroid[0], centroid[1]), 5, (0, 0, 255), -1)
+        # cv2.imshow('transformed_frame',transformed_frame)
+        # cv2.waitKey(100)
         # print(centroid)
-        conversion_factory = 1./640.
-        conversion_factorx = 1./480.
+        conversion_factory = 2./640.
+        conversion_factorx = 2./480.
         for i in range(6):
             if centroid:
                 midy[i] = (i+1)*(320-centroid[0])  * conversion_factory

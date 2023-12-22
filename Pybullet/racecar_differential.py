@@ -47,7 +47,8 @@ class pybullet_dynamics:
     # p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall3Id,basePosition=[3.5, 2, 0.5],baseOrientation=p.getQuaternionFromEuler([0,0,67.55]))
     orn = p.getQuaternionFromEuler([0, 0, 0])
     # car = p.loadURDF("racecar/racecar.urdf", [0, 20, 1],orn)
-    car = p.loadURDF("racecar/racecar_differential.urdf",[0,20,1],orn)  #, [0,0,2],useFixedBase=True)
+    pos = [0, 20, 1]
+    car = p.loadURDF("racecar/racecar_differential.urdf",pos,orn)  #, [0,0,2],useFixedBase=True)
     # box = p.loadURDF("Pybullet/box.urdf", [0, 20, 0.2], orn)  # , [0,0,2],useFixedBase=True)
     for i in range(p.getNumJoints(car)):
       print(p.getJointInfo(car, i))

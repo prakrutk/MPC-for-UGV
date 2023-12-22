@@ -2,6 +2,9 @@ import pybullet as p
 import time
 import pybullet_data
 import math
+import numpy as np
+import cv2
+from Waypoint_generation.segment import Segment
 
 
 cid = p.connect(p.SHARED_MEMORY)
@@ -18,25 +21,26 @@ img_w, img_h = 120, 80
 #for video recording (works best on Mac and Linux, not well on Windows)
 #p.startStateLogging(p.STATE_LOGGING_VIDEO_MP4, "racecar.mp4")
 p.setRealTimeSimulation(useRealTimeSim)  # either this
-p.loadURDF("plane.urdf")
+# p.loadURDF("plane.urdf")
+p.loadSDF("stadium.sdf")
 Wall1Id = p.createCollisionShape(p.GEOM_BOX,
-                                  halfExtents=[0.05,5,0.5])
+                                  halfExtents=[0.05,0.05,0.05])
 Wall2Id = p.createCollisionShape(p.GEOM_BOX,
                                   halfExtents=[0.05,2,0.5])
 Wall3Id = p.createCollisionShape(p.GEOM_BOX,
                                   halfExtents=[0.05,1.5,0.5])
 Wall4Id = p.createCollisionShape(p.GEOM_BOX,
                                   halfExtents=[0.05,3.5,0.5])
-p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[5, 0, 0.5])
-p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[0, 5, 0.5],baseOrientation=p.getQuaternionFromEuler([0,0,67.55]))
-p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[0, -5, 0.5],baseOrientation=p.getQuaternionFromEuler([0,0,-67.55]))
-p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[-5, 0, 0.5])
-p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall2Id,basePosition=[-1, 3, 0.5])
-p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall3Id,basePosition=[-3.5, 1, 0.5],baseOrientation=p.getQuaternionFromEuler([0,0,67.55]))
-p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall4Id,basePosition=[1, -1.5, 0.5])
-p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall3Id,basePosition=[3.5, 2, 0.5],baseOrientation=p.getQuaternionFromEuler([0,0,67.55]))
+p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[-2, 4, 0.5])
+# p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[0, 5, 0.5],baseOrientation=p.getQuaternionFromEuler([0,0,67.55]))
+# p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[0, -5, 0.5],baseOrientation=p.getQuaternionFromEuler([0,0,-67.55]))
+# p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall1Id,basePosition=[-5, 0, 0.5])
+# p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall2Id,basePosition=[-1, 3, 0.5])
+# p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall3Id,basePosition=[-3.5, 1, 0.5],baseOrientation=p.getQuaternionFromEuler([0,0,67.55]))
+# p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall4Id,basePosition=[1, -1.5, 0.5])
+# p.createMultiBody(baseMass=0,baseCollisionShapeIndex=Wall3Id,basePosition=[3.5, 2, 0.5],baseOrientation=p.getQuaternionFromEuler([0,0,67.55]))
 
-car = p.loadURDF("racecar/racecar_differential.urdf",[-4,4,0])  #, [0,0,2],useFixedBase=True)
+car = p.loadURDF("racecar/racecar_differential.urdf",[0,20,1])  #, [0,0,2],useFixedBase=True)
 for i in range(p.getNumJoints(car)):
   print(p.getJointInfo(car, i))
 for wheel in range(p.getNumJoints(car)):
@@ -128,6 +132,10 @@ p.changeConstraint(c, gearRatio=-1, gearAuxLink=15, maxForce=10000)
 
 steering = [0, 2]
 
+for i in range(100):
+  p.stepSimulation()
+  time.sleep(1. / 240.)
+
 targetVelocitySlider = p.addUserDebugParameter("wheelVelocity", -50, 50, 0)
 maxForceSlider = p.addUserDebugParameter("maxForce", 0, 50, 20)
 steeringSlider = p.addUserDebugParameter("steering", -1, 1, 0)
@@ -148,28 +156,49 @@ while (True):
     p.setJointMotorControl2(car, steer, p.POSITION_CONTROL, targetPosition=-steeringAngle)
     agent_pos, agent_orn =p.getBasePositionAndOrientation(car)
 
-    yaw = p.getEulerFromQuaternion(agent_orn)[-1]
-    xA, yA, zA = agent_pos
-    zA = zA + 0.3 # make the camera a little higher than the robot
+  p.resetDebugVisualizerCamera(5, 0, -40, agent_pos)
 
-    # compute focusing point of the camera
-    xB = xA + math.cos(yaw) * distance
-    yB = yA + math.sin(yaw) * distance
-    zB = zA
+  yaw = p.getEulerFromQuaternion(agent_orn)[-1]
+  xA, yA, zA = agent_pos
+  zA = zA + 0.3 # make the camera a little higher than the robot
 
-    view_matrix = p.computeViewMatrix(
-                        cameraEyePosition=[xA, yA, zA],
-                        cameraTargetPosition=[xB, yB, zB],
-                        cameraUpVector=[0, 0, 1.0]
-                    )
+  # compute focusing point of the camera
+  xB = xA + math.cos(yaw) * distance
+  yB = yA + math.sin(yaw) * distance
+  zB = zA
 
-    projection_matrix = p.computeProjectionMatrixFOV(
-                            fov=90, aspect=1.5, nearVal=0.02, farVal=3.5)
+  view_matrix = p.computeViewMatrix(
+                      cameraEyePosition=[xA, yA, zA],
+                      cameraTargetPosition=[xB, yB, zB],
+                      cameraUpVector=[0, 0, 1.0]
+                  )
 
-    imgs = p.getCameraImage(img_w, img_h,
-                            view_matrix,
-                            projection_matrix, shadow=True,
-                            renderer=p.ER_BULLET_HARDWARE_OPENGL)
+  projection_matrix = p.computeProjectionMatrixFOV(
+                          fov=90, aspect=1.5, nearVal=0.02, farVal=3.5)
+  
+  # print('view_matrix=',len(view_matrix))
+  # print('projection_matrix=',len(projection_matrix))
+
+  imgs = p.getCameraImage(img_w, img_h,
+                          view_matrix,
+                          projection_matrix, shadow=True,
+                          renderer=p.ER_BULLET_HARDWARE_OPENGL)
+  
+  frame = cv2.resize(imgs[2], (640, 480))
+  midpoints = Segment()
+  midx,midy = midpoints.read_video(frame)
+  
+  frame = cv2.resize(imgs[2], (640, 480))
+  depth = imgs[3]
+  # cv2.imshow('depth',depth)
+  # cv2.waitKey(10000)
+  # print('depth=',len(depth))
+  # d = depth[240][320]
+  # cv2.imshow('frame',frame)
+  # cv2.waitKey(10000)
+
+
+
   steering
   if (useRealTimeSim == 0):
     p.stepSimulation()

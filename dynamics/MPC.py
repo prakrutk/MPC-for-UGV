@@ -53,7 +53,7 @@ coeff = dynamics(state = x_i
                 ,m = 6.38
                 ,alphaf = (5./360.)*2*np.pi
                 ,lf = 0.1
-                ,lr = 0.05
+                ,lr = 0.1
                 ,iz = 0.058
                 ,T = 1./240.
                 ,Nc = Nc
@@ -205,7 +205,8 @@ def linearmpc(x_i,u_i,xr,t,midx,midy,Yreff):
     xr[4] = (Yreff[3*index+4] - Yreff[3*index+1])*240
     xr[5] = (Yreff[3*index+5] - Yreff[3*index+2])*240
 
-    ur[0] = xr[3]  
+    ur[0] = xr[3]
+    ur[1] = xr[2]  
     # print(xr)
     # print('x_i=',x_i)
     # print('x_i + midx = ',(x_i[0]+midx))
@@ -365,8 +366,8 @@ def simulate(initial_state,goal,cars,wheels,distance,Yreff):
     u_t = np.array([0.0,0.0])
     x,phi,midx,midy,vel,omega = pybullet_dynamics.loop(0,10,0,wheels,cars,distance,Yreff)
     while MAX_TIME >= time:
-        # u, u_old,Yreff = linearmpc(state,u_t,xr,time,midx,midy,Yreff)
-        u, u_old,Yreff = MPC(state,u_t,xr,time,midx,midy,Yreff)
+        u, u_old,Yreff = linearmpc(state,u_t,xr,time,midx,midy,Yreff)
+        # u, u_old,Yreff = MPC(state,u_t,xr,time,midx,midy,Yreff)
         for i in range(Nc):
             # x,phi = pyconnect(2*u[2*i,0],u[2*i+1,0],wheels,car,useRealTimeSim)
             # print('u[2*i,0] + u_old[0]=',u[2*i,0]+u_old[0])
