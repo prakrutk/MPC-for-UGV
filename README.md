@@ -67,7 +67,7 @@ To run Waypoint generation code: \
 #### Contour detection:
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Contourdetection.gif)
 
-### Dynamics Model:
+### Dynamics Model: (To be updated)
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Model.png)
 
 ##### Notations:
