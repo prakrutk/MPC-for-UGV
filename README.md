@@ -1,4 +1,4 @@
-#Model Predictive Control (MPC) for Unmanned Ground Vehicles (UGV) : (Course Project)
+# Model Predictive Control (MPC) for Unmanned Ground Vehicles (UGV) : (Course Project)
 
 ## Problem Statement:
 Model Predictive Control(MPC) for trajectory tracking on Unmanned Ground Vehicle (UGV) with waypoint generation in unknown environment using perception. 
