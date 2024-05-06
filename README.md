@@ -125,11 +125,3 @@ To run MPC code: \
 
 To run Waypoint generation code: \
 ``` python3 Waypoint_generation/Waypoint_new.py```
-
-# Authors list:
-1. Prakrut Kotecha
-2. Aastha Mishra
-3. Ishita Ganjoo
-4. Mehul Nakra
-5. Sayli Sawant
-6. Tirth D Shiyala
