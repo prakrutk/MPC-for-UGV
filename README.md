@@ -178,3 +178,11 @@ $$\Theta = \begin{bmatrix} \bar C \bar A \\\\ \bar C \bar A^2 \\\\ \bar C \bar A
 
 $$\eta = C\zeta$$
 
+
+# Authors list:
+1. Prakrut Kotecha
+2. Aastha Mishra
+3. Ishita Ganjoo
+4. Mehul Nakra
+5. Sayli Sawant
+6. Tirth D Shiyala
