@@ -131,5 +131,5 @@ To run Waypoint generation code: \
 2. Aastha Mishra
 3. Ishita Ganjoo
 4. Mehul Nakra
-5. Sayli
-6. Tirth
+5. Sayli Sawant
+6. Tirth D Shiyala
