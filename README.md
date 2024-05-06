@@ -34,38 +34,8 @@ To run MPC code: \
 To run Waypoint generation code: \
 ``` python3 Waypoint_generation/Waypoint_new.py```
 
-### Simulation result: 
+Slides for more details: [[link]](https://docs.google.com/presentation/d/1EOERHrvmmig15cRWBNJTbL0w9K2bnEmMU350yCoVCFA/edit?usp=sharing)
 
-#### PyBullet: 
- 
-![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Pybullet/Sim.gif)
-
-#### Gazebo: 
-
-![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/ROS-Gazebo/Cafe_Husky.jpeg)
-
-#### Integrated fail 1:
-![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/laneerror.gif)
-
-### Waypoint Generation: 
-<!--
-##### Actual Image: 
-![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Waypoint_generation/Test.png)
-
-##### Canny-Edge detection: 
-![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Waypoint_generation/canny.png)
-
-##### Hough Line: 
-![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Waypoint_generation/result.png) -->
-#### Canny-edge + Hough Transform
-##### Input with mask edges:
-![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/input.gif)
-
-##### Output bird-eye view with waypoint:
-![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/output.gif)
-
-#### Contour detection:
-![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Contourdetection.gif)
 
 ### Dynamics Model: (To be updated)
 ![](https://github.com/prakrutk/FOR_Project/blob/Prakrut/Model.png)
