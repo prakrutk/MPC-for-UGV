@@ -1,6 +1,4 @@
-# FOR_Project
-
-## Model Predictive Control (MPC) for Unmanned Ground Vehicles (UGV)
+#Model Predictive Control (MPC) for Unmanned Ground Vehicles (UGV) : (Course Project)
 
 ## Problem Statement:
 Model Predictive Control(MPC) for trajectory tracking on Unmanned Ground Vehicle (UGV) with waypoint generation in unknown environment using perception. 
@@ -128,3 +126,10 @@ To run MPC code: \
 To run Waypoint generation code: \
 ``` python3 Waypoint_generation/Waypoint_new.py```
 
+# Authors list:
+1. Prakrut Kotecha
+2. Aastha Mishra
+3. Ishita Ganjoo
+4. Mehul Nakra
+5. Sayli
+6. Tirth
